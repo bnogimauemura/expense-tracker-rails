@@ -17,6 +17,18 @@ class ExpensesController < ApplicationController
         end
     end
 
+    def edit_multiple
+        @expenses = Expense.where(id: params[:selected_ids])
+    end
+
+    def update_multiple
+        params[:expenses].each do |id, attributes|
+            expense = Expense.find(id)
+            expense.update(attributes.permit(:date, :description, :price, :category))
+        end
+        redirect_to expenses_path, notice: "Expenses updated successfully."
+    end
+
     private
 
     def expense_params

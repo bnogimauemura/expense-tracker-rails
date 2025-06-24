@@ -1,0 +1,33 @@
+<h1>Edit Selected Expenses</h1>
+
+<%= form_tag update_multiple_expenses_path, method: :patch, data: { turbo: false } do %>
+  <% @expenses.each do |expense| %>
+    <fieldset>
+      <legend>Expense #<%= expense.id %></legend>
+
+      <%= hidden_field_tag "expenses[#{expense.id}][id]", expense.id %>
+
+      <p>
+        <%= label_tag "expenses_#{expense.id}_date", "Date" %><br>
+        <%= date_field_tag "expenses[#{expense.id}][date]", expense.date %>
+      </p>
+
+      <p>
+        <%= label_tag "expenses_#{expense.id}_description", "Description" %><br>
+        <%= text_field_tag "expenses[#{expense.id}][description]", expense.description %>
+      </p>
+
+      <p>
+        <%= label_tag "expenses_#{expense.id}_price", "Price" %><br>
+        <%= number_field_tag "expenses[#{expense.id}][price]", expense.price %>
+      </p>
+
+      <p>
+        <%= label_tag "expenses_#{expense.id}_category", "Category" %><br>
+        <%= text_field_tag "expenses[#{expense.id}][category]", expense.category %>
+      </p>
+    </fieldset>
+  <% end %>
+
+  <%= submit_tag "Save Changes" %>
+<% end %>
