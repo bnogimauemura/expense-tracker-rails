@@ -2,15 +2,36 @@
 
 <%= link_to "Add Expense", new_expense_path %>
 
+<!-- Toggle Edit Mode -->
+<button onclick="toggleEditMode()">Edit</button>
+
 <h2>Total: ¥ <%= @total_price %></h2>
 
-<ul>
+<!-- Form just to select one item to edit -->
+<%= form_with url: edit_multiple_expenses_path, method: :post, data: { turbo: false } do %>
+
+  <ul>
     <% @expenses.each do |expense| %>
         <li>
+          <!-- Show checkbox in Edit Mode -->
+          <input type="checkbox" class="edit-checkbox" name="selected_ids[]" value="<%= expense.id %>" style="display: none;">
           <strong><%= expense.date %></strong> -
           <%= expense.description %> -
           ¥<%= expense.price %> -
           <%= expense.category %>
         </li>
     <% end %>
-</ul>
+  </ul>
+
+<!-- Button appears only in Edit Mode -->
+  <button type="submit" class="edit-checkbox" style="display: none;">Edit Selected</button>
+<% end %>
+
+<script>
+   function toggleEditMode() {
+    const items = document.querySelectorAll('.edit-checkbox');
+    items.forEach(item => {
+        item.style.display = item.style.display === 'none' ? 'inline-block' : 'none';
+    });
+   }
+</script>
