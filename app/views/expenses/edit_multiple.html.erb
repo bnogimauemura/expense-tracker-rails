@@ -9,22 +9,22 @@
 
       <p>
         <%= label_tag "expenses_#{expense.id}_date", "Date" %><br>
-        <%= date_field_tag "expenses[#{expense.id}][date]", expense.date %>
+        <%= date_field_tag "expenses[#{expense.id}][date]", expense.date, autocomplete: "off" %>
       </p>
 
       <p>
         <%= label_tag "expenses_#{expense.id}_description", "Description" %><br>
-        <%= text_field_tag "expenses[#{expense.id}][description]", expense.description %>
+        <%= text_field_tag "expenses[#{expense.id}][description]", expense.description, autocomplete: "off" %>
       </p>
 
       <p>
         <%= label_tag "expenses_#{expense.id}_price", "Price" %><br>
-        <%= number_field_tag "expenses[#{expense.id}][price]", expense.price %>
+        <%= number_field_tag "expenses[#{expense.id}][price]", expense.price, autocomplete: "off" %>
       </p>
 
       <p>
         <%= label_tag "expenses_#{expense.id}_category", "Category" %><br>
-        <%= text_field_tag "expenses[#{expense.id}][category]", expense.category %>
+        <%= text_field_tag "expenses[#{expense.id}][category]", expense.category, autocomplete: "off" %>
       </p>
     </fieldset>
   <% end %>
