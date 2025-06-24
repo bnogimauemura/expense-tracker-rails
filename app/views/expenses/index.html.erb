@@ -7,31 +7,34 @@
 
 <h2>Total: ¥ <%= @total_price %></h2>
 
-<!-- Form just to select one item to edit -->
-<%= form_with url: edit_multiple_expenses_path, method: :post, data: { turbo: false } do %>
-
+<!-- Expense List with checkboxes (visible only in edit mode) -->
+<%= form_with url: edit_multiple_expenses_path, method: :post, data: { turbo: false }, id: "edit-form" do %>
   <ul>
     <% @expenses.each do |expense| %>
-        <li>
-          <!-- Show checkbox in Edit Mode -->
-          <input type="checkbox" class="edit-checkbox" name="selected_ids[]" value="<%= expense.id %>" style="display: none;">
-          <strong><%= expense.date %></strong> -
-          <%= expense.description %> -
-          ¥<%= expense.price %> -
-          <%= expense.category %>
-        </li>
+      <li>
+        <input type="checkbox" class="edit-mode" name="selected_ids[]" value="<%= expense.id %>" style="display: none;">
+        <strong><%= expense.date %></strong> -
+        <%= expense.description %> -
+        ¥<%= expense.price %> -
+        <%= expense.category %>
+      </li>
     <% end %>
   </ul>
+  <!-- Edit Button (only visible in edit mode) -->
+  <button type="submit" class="edit-mode" style="display: none;">Edit Selected</button>
+<% end %>
 
-<!-- Button appears only in Edit Mode -->
-  <button type="submit" class="edit-checkbox" style="display: none;">Edit Selected</button>
+<!-- DELETE FORM (independent) -->
+<%= form_with url: destroy_multiple_expenses_path, method: :delete, data: { turbo: false }, id: "delete-form" do %>
+  <%# Reuse same checkboxes via JS cloning or a new selection round %>
+  <!-- Button appears only in edit mode -->
+  <button type="submit" class="edit-mode" style="display: none;">Delete Selected</button>
 <% end %>
 
 <script>
-   function toggleEditMode() {
-    const items = document.querySelectorAll('.edit-checkbox');
-    items.forEach(item => {
-        item.style.display = item.style.display === 'none' ? 'inline-block' : 'none';
+  function toggleEditMode() {
+    document.querySelectorAll('.edit-mode').forEach(el => {
+      el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'inline-block' : 'none';
     });
-   }
+  }
 </script>

@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   # - Submits updates for all selected items
   post  "/expenses/edit_multiple",   to: "expenses#edit_multiple",   as: :edit_multiple_expenses
   patch "/expenses/update_multiple", to: "expenses#update_multiple", as: :update_multiple_expenses
+  delete "/expenses/destroy_multiple", to: "expenses#destroy_multiple", as: :destroy_multiple_expenses
 
   # Set root path to the expense list
   root "expenses#index"
