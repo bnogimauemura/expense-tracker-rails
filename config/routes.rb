@@ -9,6 +9,12 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # Expenses resource routes
+  resources :expenses      # generates all RESTful routes (index, new, create, edit, update, delete, show)
+
   # Defines the root path route ("/")
   # root "posts#index"
+  
+  # Root path
+  root "expenses#index"    # makes the homepage list expenses
 end
