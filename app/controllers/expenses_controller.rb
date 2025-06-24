@@ -1,6 +1,7 @@
 class ExpensesController < ApplicationController
     def index
         @expenses = Expense.all.order(date: :desc)
+        @total_price = @expenses.sum(:price)
     end
 
     def new 
