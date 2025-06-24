@@ -29,6 +29,17 @@ class ExpensesController < ApplicationController
         redirect_to expenses_path, notice: "Expenses updated successfully."
     end
 
+    def destroy_multiple
+        Expense.where(id: params[:selected_ids]).destroy_all
+        redirect_to expenses_path, notice: "Selected expenses deleted successfully."
+    end
+
+    def destroy
+        @expense = Expense.where(params[:selected_ids])
+        @expense.destroy_all
+        redirect_to expenses_path, notice: "Expense deleted successfully."
+    end
+
     private
 
     def expense_params
