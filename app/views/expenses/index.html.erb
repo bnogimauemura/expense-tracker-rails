@@ -1,0 +1,14 @@
+<h1>Expenses</h1>
+
+<%= link_to "Add Expense", new_expense_path %>
+
+<ul>
+    <% @expenses.each do |expense| %>
+        <li>
+          <strong><%= expense.date %></strong> -
+          <%= expense.description %> -
+          ¥<%= expense.price %> -
+          <%= expense.category %>
+        </li>
+    <% end %>
+</ul>
