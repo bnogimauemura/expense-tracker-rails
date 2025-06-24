@@ -4,7 +4,7 @@ class ExpensesController < ApplicationController
         @total_price = @expenses.sum(:price)
     end
 
-    def new 
+    def new
         @expense = Expense.new
     end
 
