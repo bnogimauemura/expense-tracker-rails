@@ -39,7 +39,7 @@ class ExpensesController < ApplicationController
         @expense.destroy_all
         redirect_to expenses_path, notice: "Expense deleted successfully."
     end
-    
+
     private
 
     def expense_params
