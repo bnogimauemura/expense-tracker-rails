@@ -44,7 +44,7 @@ class ExpensesController < ApplicationController
     def destroy_multiple
         # The IDs come as a list separated by commas from the webpage
         # Split them up and clean them
-        selected_ids = params[:selected_ids].to_s.split(',').map(&:strip).reject(&:blank?)
+        selected_ids = params[:selected_ids].to_s.split(",").map(&:strip).reject(&:blank?)
         Expense.where(id: selected_ids).destroy_all  # Delete all the selected expenses
         redirect_to expenses_path, notice: "Selected expenses deleted successfully."
     end
