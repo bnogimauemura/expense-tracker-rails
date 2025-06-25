@@ -1,16 +1,16 @@
 class Expense < ApplicationRecord
   # Predefined categories for consistent categorization
   CATEGORIES = [
-    'Food & Dining',
-    'Transportation',
-    'Shopping',
-    'Entertainment',
-    'Healthcare',
-    'Utilities',
-    'Housing',
-    'Education',
-    'Travel',
-    'Other'
+    "Food & Dining",
+    "Transportation",
+    "Shopping",
+    "Entertainment",
+    "Healthcare",
+    "Utilities",
+    "Housing",
+    "Education",
+    "Travel",
+    "Other"
   ].freeze
 
   # Validations
@@ -32,7 +32,7 @@ class Expense < ApplicationRecord
   def self.category_percentages(expenses = all)
     total = expenses.sum(:price)
     return {} if total.zero?
-    
+
     expenses.reorder(nil).group(:category).sum(:price).transform_values { |amount| (amount / total.to_f * 100).round(1) }
   end
 

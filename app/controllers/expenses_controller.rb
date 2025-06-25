@@ -4,7 +4,7 @@ class ExpensesController < ApplicationController
         # Get only current month expenses
         @expenses = Expense.current_month.order(date: :desc)
         @total_price = @expenses.sum(:price)
-        
+
         # Get category totals for the current month
         @category_totals = Expense.total_by_category(@expenses)
         @category_percentages = Expense.category_percentages(@expenses)
