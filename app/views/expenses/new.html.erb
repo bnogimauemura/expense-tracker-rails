@@ -1,27 +1,96 @@
-<h1>New Expense</h1>
+<!-- The page where you add a new expense -->
+<div class="container">
+  <!-- The top part with the title and description -->
+  <div class="header fade-in">
+    <h1>➕ Add New Expense</h1>
+    <p>Track your spending with detailed information</p>
+  </div>
 
-<%= form_with model: @expense, local: true do |form| %>
-    <p>
-      <%= form.label :date %><br>
-      <%= form.date_field :date %>
-    </p>
+  <!-- The form where you type in your expense details -->
+  <div class="form-container fade-in">
+    <!-- This makes a form that will save your expense -->
+    <%= form_with model: @expense, local: true do |form| %>
+      <!-- The date field -->
+      <div class="form-group">
+        <%= form.label :date, class: "form-label" %>
+        <%= form.date_field :date, class: "form-input", value: Date.current %>
+      </div>
 
-    <p>
-      <%= form.label :description %><br>
-      <%= form.text_field :description %>
-    </p>
+      <!-- The description field -->
+      <div class="form-group">
+        <%= form.label :description, class: "form-label" %>
+        <%= form.text_field :description, class: "form-input", placeholder: "e.g., Grocery shopping, Restaurant dinner..." %>
+      </div>
 
-    <p>
-      <%= form.label :price %><br>
-      <%= form.number_field :price %>
-    </p>
+      <!-- The price field -->
+      <div class="form-group">
+        <%= form.label :price, class: "form-label" %>
+        <%= form.number_field :price, class: "form-input", placeholder: "0", step: "0.01", min: "0" %>
+      </div>
 
-    <p>
-      <%= form.label :category %><br>
-      <%= form.text_field :category %>
-    </p>
+      <!-- The category field -->
+      <div class="form-group">
+        <%= form.label :category, class: "form-label" %>
+        <%= form.text_field :category, class: "form-input", placeholder: "e.g., Food, Transportation, Shopping..." %>
+      </div>
 
-    <p>
-      <%= form.submit "Save" %>
-    </p>
-<% end %>
+      <!-- The buttons at the bottom: Save and Cancel -->
+      <div class="action-bar">
+        <%= form.submit "💾 Save Expense", class: "btn btn-primary" %>
+        <%= link_to "❌ Cancel", expenses_path, class: "btn btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- The styles that make the form look nice -->
+<style>
+/* The box that holds the form */
+.form-container {
+  background: var(--card-background);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Space between each field */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+/* The labels above each field */
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* The boxes where you type your information */
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+/* When you click on a field, it gets a blue border */
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+}
+
+/* Make it work well on phones */
+@media (max-width: 768px) {
+  .form-container {
+    margin: 0 1rem;
+    padding: 1.5rem;
+  }
+}
+</style>

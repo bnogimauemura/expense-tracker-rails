@@ -1,33 +1,129 @@
-<h1>Edit Selected Expenses</h1>
+<!-- The page where you edit several expenses at once -->
+<div class="container">
+  <!-- The top part with the title and description -->
+  <div class="header fade-in">
+    <h1>✏️ Edit Selected Expenses</h1>
+    <p>Update multiple expenses at once</p>
+  </div>
 
-<%= form_tag update_multiple_expenses_path, method: :patch, data: { turbo: false } do %>
-  <% @expenses.each do |expense| %>
-    <fieldset>
-      <legend>Expense #<%= expense.id %></legend>
+  <!-- The form where you can edit all the expenses you selected -->
+  <div class="form-container fade-in">
+    <!-- This form will save all your changes when you click "Save All Changes" -->
+    <!-- It uses PATCH method and turns off Turbo so it works better -->
+    <%= form_tag update_multiple_expenses_path, method: :patch, data: { turbo: false } do %>
+      <!-- Go through each expense you selected and make a form for it -->
+      <% @expenses.each_with_index do |expense, index| %>
+        <!-- Each expense gets its own card to edit -->
+        <div class="expense-edit-card">
+          <h3>Expense #<%= expense.id %></h3>
 
-      <%= hidden_field_tag "expenses[#{expense.id}][id]", expense.id %>
+          <!-- Hidden field that tells us which expense this is -->
+          <%= hidden_field_tag "expenses[#{expense.id}][id]", expense.id %>
 
-      <p>
-        <%= label_tag "expenses_#{expense.id}_date", "Date" %><br>
-        <%= date_field_tag "expenses[#{expense.id}][date]", expense.date, autocomplete: "off" %>
-      </p>
+          <!-- The date field for this expense -->
+          <div class="form-group">
+            <%= label_tag "expenses_#{expense.id}_date", "Date", class: "form-label" %>
+            <%= date_field_tag "expenses[#{expense.id}][date]", expense.date, class: "form-input", autocomplete: "off" %>
+          </div>
 
-      <p>
-        <%= label_tag "expenses_#{expense.id}_description", "Description" %><br>
-        <%= text_field_tag "expenses[#{expense.id}][description]", expense.description, autocomplete: "off" %>
-      </p>
+          <!-- The description field for this expense -->
+          <div class="form-group">
+            <%= label_tag "expenses_#{expense.id}_description", "Description", class: "form-label" %>
+            <%= text_field_tag "expenses[#{expense.id}][description]", expense.description, class: "form-input", autocomplete: "off" %>
+          </div>
 
-      <p>
-        <%= label_tag "expenses_#{expense.id}_price", "Price" %><br>
-        <%= number_field_tag "expenses[#{expense.id}][price]", expense.price, autocomplete: "off" %>
-      </p>
+          <!-- The price field for this expense -->
+          <div class="form-group">
+            <%= label_tag "expenses_#{expense.id}_price", "Price", class: "form-label" %>
+            <%= number_field_tag "expenses[#{expense.id}][price]", expense.price, class: "form-input", step: "0.01", min: "0", autocomplete: "off" %>
+          </div>
 
-      <p>
-        <%= label_tag "expenses_#{expense.id}_category", "Category" %><br>
-        <%= text_field_tag "expenses[#{expense.id}][category]", expense.category, autocomplete: "off" %>
-      </p>
-    </fieldset>
-  <% end %>
+          <!-- The category field for this expense -->
+          <div class="form-group">
+            <%= label_tag "expenses_#{expense.id}_category", "Category", class: "form-label" %>
+            <%= text_field_tag "expenses[#{expense.id}][category]", expense.category, class: "form-input", autocomplete: "off" %>
+          </div>
+        </div>
+      <% end %>
 
-  <%= submit_tag "Save Changes" %>
-<% end %>
+      <!-- The buttons at the bottom: Save all changes or go back -->
+      <div class="action-bar">
+        <%= submit_tag "💾 Save All Changes", class: "btn btn-success" %>
+        <%= link_to "❌ Cancel", expenses_path, class: "btn btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- The styles that make the edit form look nice -->
+<style>
+/* The big box that holds all the expense forms */
+.form-container {
+  background: var(--card-background);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Each expense gets its own card with a light background */
+.expense-edit-card {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+/* The title of each expense card */
+.expense-edit-card h3 {
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Space between each field */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+/* The labels above each field */
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* The boxes where you type your information */
+.form-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+/* When you click on a field, it gets a blue border */
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+}
+
+/* Make it work well on phones */
+@media (max-width: 768px) {
+  .form-container {
+    margin: 0 1rem;
+    padding: 1.5rem;
+  }
+  
+  .expense-edit-card {
+    padding: 1rem;
+  }
+}
+</style>

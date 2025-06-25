@@ -1,67 +1,188 @@
-<h1>Expenses</h1>
+<!-- The main page where you see all your expenses -->
+<div class="container">
+  <!-- The top part with the title and description -->
+  <div class="header fade-in">
+    <h1>💰 Expense Tracker</h1>
+    <p>Track your spending and stay organized</p>
+  </div>
 
-<%= link_to "Add Expense", new_expense_path %>
+  <!-- The big card that shows your total spending -->
+  <div class="total-card fade-in">
+    <h2>Total Expenses</h2>
+    <div class="amount">¥<%= number_with_delimiter(@total_price) %></div>
+  </div>
 
-<!-- Toggle Edit Mode -->
-<button onclick="toggleEditMode()">Edit</button>
-
-<h2>Total: ¥ <%= @total_price %></h2>
-
-<!-- Expense List with checkboxes (visible only in edit mode) -->
-<%= form_with url: edit_multiple_expenses_path, method: :post, data: { turbo: false }, id: "edit-form" do %>
-  <ul>
-    <% @expenses.each do |expense| %>
-      <li>
-        <input type="checkbox" class="edit-mode master-checkbox" name="selected_ids[]" value="<%= expense.id %>" style="display: none;">
-        <strong><%= expense.date %></strong> -
-        <%= expense.description %> -
-        ¥<%= expense.price %> -
-        <%= expense.category %>
-      </li>
+  <!-- The buttons at the top for adding expenses and editing -->
+  <div class="action-bar fade-in">
+    <%= link_to new_expense_path, class: "btn btn-primary" do %>
+      ➕ Add Expense
     <% end %>
-  </ul>
-  <!-- EDIT BUTTON (hidden initially) -->
-  <button type="submit" class="edit-mode action-button" style="display: none;">Edit Selected</button>
-<% end %>
+    
+    <!-- Button to turn on edit mode (shows the checkboxes) -->
+    <button onclick="toggleEditMode()" class="btn btn-secondary" id="edit-toggle">
+      ✏️ Edit Mode
+    </button>
+  </div>
 
-<!-- DELETE FORM (independent) -->
-<%= form_with url: destroy_multiple_expenses_path, method: :delete, data: { turbo: false }, id: "delete-form" do %>
-  <%# Reuse same checkboxes via JS cloning or a new selection round %>
-  <!-- DELETE BUTTON (hidden initially) -->
-  <button type="submit" class="edit-mode action-button" style="display: none;">Delete Selected</button>
-<% end %>
+  <!-- The main list where all your expenses are shown -->
+  <div class="expense-list fade-in">
+    <div class="expense-list-header">
+      <h3>📋 Your Expenses</h3>
+    </div>
 
+    <% if @expenses.any? %>
+      <!-- FORM 1: This form is for editing expenses -->
+      <!-- When you check some boxes and click "Edit Selected" -->
+      <%= form_with url: edit_multiple_expenses_path, method: :post, data: { turbo: false }, id: "edit-form" do %>
+        <% @expenses.each do |expense| %>
+          <!-- Each expense item with its own checkbox -->
+          <div class="expense-item">
+            <!-- The checkbox you click to select an expense (hidden until you turn on edit mode) -->
+            <input type="checkbox" 
+                   class="expense-checkbox edit-mode" 
+                   name="selected_ids[]" 
+                   value="<%= expense.id %>" 
+                   id="expense_<%= expense.id %>">
+            
+            <!-- The information about this expense -->
+            <div class="expense-content">
+              <div class="expense-date">
+                <%= expense.date.strftime('%b %d, %Y') %>
+              </div>
+              
+              <div class="expense-description">
+                <%= expense.description %>
+              </div>
+              
+              <div class="expense-price">
+                ¥<%= number_with_delimiter(expense.price) %>
+              </div>
+              
+              <div class="expense-category">
+                <%= expense.category.present? ? expense.category : 'General' %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        
+        <!-- The "Edit Selected" button (hidden until you check some boxes) -->
+        <div class="action-bar edit-mode" id="edit-actions" style="margin: 1.5rem; display: none;">
+          <button type="submit" class="btn btn-success">
+            ✏️ Edit Selected
+          </button>
+        </div>
+      <% end %>
+
+      <!-- FORM 2: This form is for deleting expenses -->
+      <!-- This is a separate form so it doesn't mess up the edit form -->
+      <%= form_with url: destroy_multiple_expenses_path, method: :delete, data: { turbo: false }, id: "delete-form" do %>
+        <!-- Hidden field that will hold the IDs of expenses you want to delete -->
+        <input type="hidden" name="selected_ids" id="delete-selected-ids" value="">
+        
+        <!-- The "Delete Selected" button (hidden until you check some boxes) -->
+        <div class="action-bar edit-mode" id="delete-actions" style="margin: 1.5rem; display: none;">
+          <button type="submit" class="btn btn-danger" onclick="return prepareDelete()">
+            🗑️ Delete Selected
+          </button>
+        </div>
+      <% end %>
+    <% else %>
+      <!-- This shows when you have no expenses yet -->
+      <div class="empty-state">
+        <h3>No expenses yet</h3>
+        <p>Start tracking your expenses by adding your first one!</p>
+        <%= link_to new_expense_path, class: "btn btn-primary" do %>
+          ➕ Add Your First Expense
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- The code that makes the buttons and checkboxes work -->
 <script>
-let checkboxes, actionButtons;
+// These are like boxes to store important things from the webpage
+let checkboxes, actionButtons, editActions, deleteActions, editToggle;
 
+// This runs when the page finishes loading
 document.addEventListener('DOMContentLoaded', () => {
-  checkboxes = document.querySelectorAll('.master-checkbox');
-  actionButtons = document.querySelectorAll('.action-button');
+  // Find all the important things on the page
+  checkboxes = document.querySelectorAll('.expense-checkbox');
+  actionButtons = document.querySelectorAll('.edit-mode');
+  editActions = document.getElementById('edit-actions');
+  deleteActions = document.getElementById('delete-actions');
+  editToggle = document.getElementById('edit-toggle');
 
+  // If there are no checkboxes, hide the buttons
   if (checkboxes.length === 0) {
     actionButtons.forEach(btn => btn.style.display = 'none');
     return;
   }
 
+  // Make each checkbox do something when you click it
   checkboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', () => {
-      const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
-
-      actionButtons.forEach(btn => {
-        btn.style.display = anyChecked ? 'inline-block' : 'none';
-      });
-    });
+    checkbox.addEventListener('change', updateActionButtons);
   });
 });
 
-function toggleEditMode() {
-  checkboxes.forEach(el => {
-    el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'inline-block' : 'none';
-  });
-
+// This shows or hides the buttons based on what you checked
+function updateActionButtons() {
   const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
-  actionButtons.forEach(btn => {
-    btn.style.display = anyChecked ? 'inline-block' : 'none'
+  
+  // Only show the buttons if you checked at least one expense
+  if (editActions) editActions.style.display = anyChecked ? 'flex' : 'none';
+  if (deleteActions) deleteActions.style.display = anyChecked ? 'flex' : 'none';
+}
+
+// This turns edit mode on and off
+function toggleEditMode() {
+  const editModeElements = document.querySelectorAll('.edit-mode');
+  const isVisible = editModeElements[0].style.display !== 'none' && editModeElements[0].style.display !== '';
+  
+  // Show or hide all the edit mode things (checkboxes and buttons)
+  editModeElements.forEach(el => {
+    el.style.display = isVisible ? 'none' : 'inline-block';
+  });
+  
+  // Hide the action buttons when you turn off edit mode
+  if (editActions) editActions.style.display = 'none';
+  if (deleteActions) deleteActions.style.display = 'none';
+  
+  // Change the button text to show what it will do
+  editToggle.innerHTML = isVisible ? '✏️ Edit Mode' : '❌ Cancel Edit';
+  
+  // Uncheck all the boxes when you turn off edit mode
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = false;
   });
 }
+
+// This gets ready to delete expenses before you confirm
+function prepareDelete() {
+  // Find all the checkboxes you checked
+  const checkedBoxes = Array.from(checkboxes).filter(checkbox => checkbox.checked);
+  
+  // Show an error if you didn't check any boxes
+  if (checkedBoxes.length === 0) {
+    alert('Please select at least one expense to delete.');
+    return false;
+  }
+  
+  // Get the IDs of all the expenses you checked
+  const selectedIds = checkedBoxes.map(checkbox => checkbox.value);
+  
+  // Put the IDs in the hidden field, separated by commas
+  document.getElementById('delete-selected-ids').value = selectedIds.join(',');
+  
+  // Ask if you're sure you want to delete them
+  return confirm(`Are you sure you want to delete ${selectedIds.length} selected expense(s)?`);
+}
+
+// This makes things fade in nicely when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+  const fadeElements = document.querySelectorAll('.fade-in');
+  fadeElements.forEach((element, index) => {
+    element.style.animationDelay = `${index * 0.1}s`;
+  });
+});
 </script>
