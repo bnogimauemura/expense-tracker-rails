@@ -1,4 +1,4 @@
-<!-- The main page where you see all your expenses -->
+<!-- The main page where you see current month expenses -->
 <div class="container">
   <!-- The top part with the title and description -->
   <div class="header fade-in">
@@ -6,96 +6,135 @@
     <p>Track your spending and stay organized</p>
   </div>
 
-  <!-- The big card that shows your total spending -->
+  <!-- The big card that shows your total spending for current month -->
   <div class="total-card fade-in">
-    <h2>Total Expenses</h2>
+    <h2>Total Expenses - <%= Date.current.strftime('%B %Y') %></h2>
     <div class="amount">¥<%= number_with_delimiter(@total_price) %></div>
   </div>
 
-  <!-- The buttons at the top for adding expenses and editing -->
-  <div class="action-bar fade-in">
-    <%= link_to new_expense_path, class: "btn btn-primary" do %>
-      ➕ Add Expense
-    <% end %>
-    
-    <!-- Button to turn on edit mode (shows the checkboxes) -->
-    <button onclick="toggleEditMode()" class="btn btn-secondary" id="edit-toggle">
-      ✏️ Edit Mode
-    </button>
-  </div>
-
-  <!-- The main list where all your expenses are shown -->
-  <div class="expense-list fade-in">
-    <div class="expense-list-header">
-      <h3>📋 Your Expenses</h3>
-    </div>
-
-    <% if @expenses.any? %>
-      <!-- FORM 1: This form is for editing expenses -->
-      <!-- When you check some boxes and click "Edit Selected" -->
-      <%= form_with url: edit_multiple_expenses_path, method: :post, data: { turbo: false }, id: "edit-form" do %>
-        <% @expenses.each do |expense| %>
-          <!-- Each expense item with its own checkbox -->
-          <div class="expense-item">
-            <!-- The checkbox you click to select an expense (hidden until you turn on edit mode) -->
-            <input type="checkbox" 
-                   class="expense-checkbox edit-mode" 
-                   name="selected_ids[]" 
-                   value="<%= expense.id %>" 
-                   id="expense_<%= expense.id %>">
-            
-            <!-- The information about this expense -->
-            <div class="expense-content">
-              <div class="expense-date">
-                <%= expense.date.strftime('%b %d, %Y') %>
-              </div>
-              
-              <div class="expense-description">
-                <%= expense.description %>
-              </div>
-              
-              <div class="expense-price">
-                ¥<%= number_with_delimiter(expense.price) %>
-              </div>
-              
-              <div class="expense-category">
-                <%= expense.category.present? ? expense.category : 'General' %>
-              </div>
+  <!-- Category breakdown with graph -->
+  <% if @category_totals.any? %>
+    <div class="category-overview fade-in">
+      <h3>📊 Spending by Category</h3>
+      <div class="category-chart">
+        <% @category_totals.each do |category, total| %>
+          <% percentage = @category_percentages[category] || 0 %>
+          <div class="category-bar">
+            <div class="category-info">
+              <div class="category-name"><%= category %></div>
+              <div class="category-amount">¥<%= number_with_delimiter(total) %></div>
+              <div class="category-percentage"><%= percentage %>%</div>
+            </div>
+            <%# .bar-container is the full width (like a track). %>
+            <div class="bar-container">
+              <%# .bar is the colored part, and its width is set by the inline style. %>
+              <%# The percentage below sets the width of the bar, so higher % means a longer bar %>
+              <div class="bar" style="width: <%= percentage %>%"></div>
             </div>
           </div>
         <% end %>
-        
-        <!-- The "Edit Selected" button (hidden until you check some boxes) -->
-        <div class="action-bar edit-mode" id="edit-actions" style="margin: 1.5rem; display: none;">
-          <button type="submit" class="btn btn-success">
-            ✏️ Edit Selected
-          </button>
-        </div>
-      <% end %>
-
-      <!-- FORM 2: This form is for deleting expenses -->
-      <!-- This is a separate form so it doesn't mess up the edit form -->
-      <%= form_with url: destroy_multiple_expenses_path, method: :delete, data: { turbo: false }, id: "delete-form" do %>
-        <!-- Hidden field that will hold the IDs of expenses you want to delete -->
-        <input type="hidden" name="selected_ids" id="delete-selected-ids" value="">
-        
-        <!-- The "Delete Selected" button (hidden until you check some boxes) -->
-        <div class="action-bar edit-mode" id="delete-actions" style="margin: 1.5rem; display: none;">
-          <button type="submit" class="btn btn-danger" onclick="return prepareDelete()">
-            🗑️ Delete Selected
-          </button>
-        </div>
-      <% end %>
-    <% else %>
-      <!-- This shows when you have no expenses yet -->
-      <div class="empty-state">
-        <h3>No expenses yet</h3>
-        <p>Start tracking your expenses by adding your first one!</p>
-        <%= link_to new_expense_path, class: "btn btn-primary" do %>
-          ➕ Add Your First Expense
-        <% end %>
       </div>
-    <% end %>
+    </div>
+  <% end %>
+
+  <!-- The main list where current month expenses are shown -->
+  <div class="expense-list fade-in">
+    <div class="expense-list-header flex-header">
+      <h3>📋 Your Expenses - <%= Date.current.strftime('%B %Y') %></h3>
+      <div class="header-actions">
+        <%= link_to new_expense_path, class: "btn btn-primary" do %>
+          ➕ Add Expense
+        <% end %>
+        <button onclick="toggleEditMode()" class="btn btn-secondary" id="edit-toggle">
+          ✏️ Edit Mode
+        </button>
+      </div>
+    </div>
+    <div class="expenses-scroll-area">
+      <% if @expenses.any? %>
+        <!-- FORM 1: This form is for editing expenses -->
+        <!-- When you check some boxes and click "Edit Selected" -->
+        <%= form_with url: edit_multiple_expenses_path, method: :post, data: { turbo: false }, id: "edit-form" do %>
+          <% @expenses.each do |expense| %>
+            <!-- Each expense item with its own checkbox -->
+            <div class="expense-item">
+              <!-- The checkbox you click to select an expense (hidden until you turn on edit mode) -->
+              <input type="checkbox" 
+                     class="expense-checkbox edit-mode" 
+                     name="selected_ids[]" 
+                     value="<%= expense.id %>" 
+                     id="expense_<%= expense.id %>">
+              
+              <!-- The information about this expense -->
+              <div class="expense-content">
+                <div class="expense-date">
+                  <%= expense.date.strftime('%b %d, %Y') %>
+                </div>
+                
+                <div class="expense-description">
+                  <%= expense.description %>
+                </div>
+                
+                <div class="expense-price">
+                  ¥<%= number_with_delimiter(expense.price) %>
+                </div>
+                
+                <div class="expense-category">
+                  <%= expense.category %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+        <!-- FORM 2: This form is for deleting expenses -->
+        <!-- This is a separate form so it doesn't mess up the edit form -->
+        <%= form_with url: destroy_multiple_expenses_path, method: :delete, data: { turbo: false }, id: "delete-form" do %>
+          <!-- Hidden field that will hold the IDs of expenses you want to delete -->
+          <input type="hidden" name="selected_ids" id="delete-selected-ids" value="">
+        <% end %>
+      <% else %>
+        <!-- This shows when you have no expenses for the current month -->
+        <div class="empty-state">
+          <h3>No expenses for <%= Date.current.strftime('%B %Y') %></h3>
+          <p>Start tracking your expenses by adding your first one!</p>
+          <%= link_to new_expense_path, class: "btn btn-primary" do %>
+            ➕ Add Your First Expense
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    <!-- EDIT/DELETE BUTTONS: always at the bottom, right-aligned, with space -->
+    <div class="footer-actions-row">
+      <div class="footer-actions edit-mode" id="edit-actions" style="display: none;">
+        <button type="submit" form="edit-form" class="btn btn-success">
+          ✏️ Edit Selected
+        </button>
+      </div>
+      <div class="footer-actions edit-mode" id="delete-actions" style="display: none;">
+        <button type="submit" form="delete-form" class="btn btn-danger" onclick="return prepareDelete()">
+          🗑️ Delete Selected
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly totals bar chart -->
+  <div class="monthly-overview fade-in">
+    <h3>📅 Monthly Expenses Overview (<%= Date.current.year %>)</h3>
+    <div class="monthly-bar-chart">
+      <% max_total = @monthly_totals.map { |m| m[:total] }.max %>
+      <% @monthly_totals.each do |month_data| %>
+        <div class="month-bar-item">
+          <div class="month-label"><%= month_data[:month][0..2] %></div>
+          <div class="month-bar-container">
+            <%# The bar's height is proportional to the month's total compared to the max %>
+            <% bar_height = max_total > 0 ? (month_data[:total] / max_total.to_f * 100) : 0 %>
+            <div class="month-bar" style="height: <%= bar_height %>%"></div>
+          </div>
+          <div class="month-total">¥<%= number_with_delimiter(month_data[:total]) %></div>
+        </div>
+      <% end %>
+    </div>
   </div>
 </div>
 

@@ -1,8 +1,16 @@
 class ExpensesController < ApplicationController
-    # Main page - shows all your expenses and adds up the total
+    # Main page - shows current month expenses and adds up the total
     def index
-        @expenses = Expense.all.order(date: :desc)  # Get all expenses, newest ones first
-        @total_price = @expenses.sum(:price)        # Add up all the prices to show total
+        # Get only current month expenses
+        @expenses = Expense.current_month.order(date: :desc)
+        @total_price = @expenses.sum(:price)
+
+        # Get category totals for the current month
+        @category_totals = Expense.total_by_category(@expenses)
+        @category_percentages = Expense.category_percentages(@expenses)
+
+        # Get monthly totals for each past month of the current year
+        @monthly_totals = Expense.monthly_totals_up_to_now
     end
 
     # Shows the page where you can add a new expense
