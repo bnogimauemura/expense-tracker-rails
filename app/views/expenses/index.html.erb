@@ -12,7 +12,7 @@
   <ul>
     <% @expenses.each do |expense| %>
       <li>
-        <input type="checkbox" class="edit-mode" name="selected_ids[]" value="<%= expense.id %>" style="display: none;">
+        <input type="checkbox" class="edit-mode master-checkbox" name="selected_ids[]" value="<%= expense.id %>" style="display: none;">
         <strong><%= expense.date %></strong> -
         <%= expense.description %> -
         ¥<%= expense.price %> -
@@ -20,21 +20,48 @@
       </li>
     <% end %>
   </ul>
-  <!-- Edit Button (only visible in edit mode) -->
-  <button type="submit" class="edit-mode" style="display: none;">Edit Selected</button>
+  <!-- EDIT BUTTON (hidden initially) -->
+  <button type="submit" class="edit-mode action-button" style="display: none;">Edit Selected</button>
 <% end %>
 
 <!-- DELETE FORM (independent) -->
 <%= form_with url: destroy_multiple_expenses_path, method: :delete, data: { turbo: false }, id: "delete-form" do %>
   <%# Reuse same checkboxes via JS cloning or a new selection round %>
-  <!-- Button appears only in edit mode -->
-  <button type="submit" class="edit-mode" style="display: none;">Delete Selected</button>
+  <!-- DELETE BUTTON (hidden initially) -->
+  <button type="submit" class="edit-mode action-button" style="display: none;">Delete Selected</button>
 <% end %>
 
 <script>
-  function toggleEditMode() {
-    document.querySelectorAll('.edit-mode').forEach(el => {
-      el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'inline-block' : 'none';
-    });
+let checkboxes, actionButtons;
+
+document.addEventListener('DOMContentLoaded', () => {
+  checkboxes = document.querySelectorAll('.master-checkbox');
+  actionButtons = document.querySelectorAll('.action-button');
+
+  if (checkboxes.length === 0) {
+    actionButtons.forEach(btn => btn.style.display = 'none');
+    return;
   }
+
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+      const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+
+      actionButtons.forEach(btn => {
+        btn.style.display = anyChecked ? 'inline-block' : 'none';
+      });
+    });
+  });
+});
+
+function toggleEditMode() {
+  checkboxes.forEach(el => {
+    el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'inline-block' : 'none';
+  });
+
+  const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+  actionButtons.forEach(btn => {
+    btn.style.display = anyChecked ? 'inline-block' : 'none'
+  });
+}
 </script>
