@@ -38,10 +38,10 @@
             <%= number_field_tag "expenses[#{expense.id}][price]", expense.price, class: "form-input", step: "0.01", min: "0", autocomplete: "off" %>
           </div>
 
-          <!-- The category field for this expense -->
+          <!-- The category field for this expense (now a dropdown) -->
           <div class="form-group">
             <%= label_tag "expenses_#{expense.id}_category", "Category", class: "form-label" %>
-            <%= text_field_tag "expenses[#{expense.id}][category]", expense.category, class: "form-input", autocomplete: "off" %>
+            <%= select_tag "expenses[#{expense.id}][category]", options_for_select(Expense::CATEGORIES, expense.category), { class: "form-input" } %>
           </div>
         </div>
       <% end %>
