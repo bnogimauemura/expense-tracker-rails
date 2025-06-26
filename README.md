@@ -4,6 +4,13 @@ Expense Tracker is a web application that helps individuals manage their finance
 
 ---
 
+## Screenshots
+
+![Screenshot 2025-06-26 at 9 01 10](https://github.com/user-attachments/assets/dea0c7cc-3cdd-418c-b3cb-db5b2261b01d)
+![Screenshot 2025-06-26 at 9 01 25](https://github.com/user-attachments/assets/32cbaa20-6cd5-44ec-a56f-65e0e59e79e4)
+
+---
+
 ## Features
 
 - **Dashboard:**  
