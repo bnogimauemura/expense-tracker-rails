@@ -300,10 +300,6 @@ GEM
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
     smart_properties (1.17.0)
-    solid_cache (1.0.7)
-      activejob (>= 7.2)
-      activerecord (>= 7.2)
-      railties (>= 7.2)
     sqlite3 (1.7.3)
       mini_portile2 (~> 2.8.0)
     sshkit (1.24.0)
@@ -372,7 +368,6 @@ DEPENDENCIES
   rails (~> 8.0.2)
   rubocop-rails-omakase
   selenium-webdriver
-  solid_cache
   sqlite3 (~> 1.4)
   stimulus-rails
   thruster
