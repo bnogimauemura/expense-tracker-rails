@@ -49,6 +49,12 @@ Rails.application.configure do
   # Use memory store for caching (simple and works for basic needs)
   config.cache_store = :memory_store
 
+  # Asset configuration for production
+  config.assets.compile = true
+  config.assets.debug = false
+  config.assets.digest = true
+  config.assets.manifest = Rails.root.join("public", "assets", "manifest.json")
+
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
