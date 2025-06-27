@@ -81,8 +81,3 @@ test:
 production:
   <<: *default
   url: <%= ENV["DATABASE_URL"] %>
-  
-  # Solid Cable (ActionCable) configuration
-  cable:
-    <<: *default
-    url: <%= ENV["DATABASE_URL"] %>
