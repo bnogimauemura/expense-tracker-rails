@@ -7,7 +7,8 @@ class ExpenseTest < ActiveSupport::TestCase
       date: Date.current,
       description: "Lunch at restaurant",
       price: 1500,
-      category: "Food & Dining"
+      category: "Food & Dining",
+      user: users(:one)
     )
 
     # assert means "this should be true"
@@ -17,6 +18,7 @@ class ExpenseTest < ActiveSupport::TestCase
   # Test 2: Expense without required fields should not save
   test "should not save expense without required fields" do
     expense = Expense.new
+    expense.user = users(:one)
     # assert_not means "this should be false"
     assert_not expense.save, "Expense without required fields should not save"
   end
@@ -28,7 +30,8 @@ class ExpenseTest < ActiveSupport::TestCase
       date: Date.current,
       description: "Current month expense",
       price: 1000,
-      category: "Food & Dining"
+      category: "Food & Dining",
+      user: users(:one)
     )
 
     # Create an expense for last month
@@ -36,7 +39,8 @@ class ExpenseTest < ActiveSupport::TestCase
       date: 1.month.ago,
       description: "Last month expense",
       price: 2000,
-      category: "Transportation"
+      category: "Transportation",
+      user: users(:one)
     )
 
     # Get expenses for current month using our scope
@@ -55,14 +59,16 @@ class ExpenseTest < ActiveSupport::TestCase
       date: Date.current,
       description: "Lunch",
       price: 1000,
-      category: "Food & Dining"
+      category: "Food & Dining",
+      user: users(:one)
     )
 
     Expense.create!(
       date: Date.current,
       description: "Dinner",
       price: 2000,
-      category: "Food & Dining"
+      category: "Food & Dining",
+      user: users(:one)
     )
 
     # Get category totals for current month using the correct method

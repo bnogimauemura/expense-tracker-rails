@@ -68,7 +68,7 @@
               <!-- The information about this expense -->
               <div class="expense-content">
                 <div class="expense-date">
-                  <%= expense.date.strftime('%b %d, %Y') %>
+                  <%= (expense.date.is_a?(String) ? Date.parse(expense.date) : expense.date).strftime('%b %d, %Y') %>
                 </div>
                 
                 <div class="expense-description">
@@ -96,7 +96,7 @@
         <!-- This shows when you have no expenses for the current month -->
         <div class="empty-state">
           <h3>No expenses for <%= Date.current.strftime('%B %Y') %></h3>
-          <p>Start tracking your expenses by adding your first one!</p>
+          <p style="margin-bottom: 16px;">Start tracking your expenses by adding your first one!</p>
           <%= link_to new_expense_path, class: "btn btn-primary" do %>
             ➕ Add Your First Expense
           <% end %>
@@ -152,9 +152,12 @@ document.addEventListener('DOMContentLoaded', () => {
   deleteActions = document.getElementById('delete-actions');
   editToggle = document.getElementById('edit-toggle');
 
-  // If there are no checkboxes, hide the buttons
-  if (checkboxes.length === 0) {
-    actionButtons.forEach(btn => btn.style.display = 'none');
+  // Always hide the buttons if there are no checkboxes (no expenses)
+  if (!checkboxes || checkboxes.length === 0) {
+    if (actionButtons) actionButtons.forEach(btn => btn.style.display = 'none');
+    if (editActions) editActions.style.display = 'none';
+    if (deleteActions) deleteActions.style.display = 'none';
+    if (editToggle) editToggle.style.display = 'none';
     return;
   }
 
@@ -167,7 +170,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // This shows or hides the buttons based on what you checked
 function updateActionButtons() {
   const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
-  
   // Only show the buttons if you checked at least one expense
   if (editActions) editActions.style.display = anyChecked ? 'flex' : 'none';
   if (deleteActions) deleteActions.style.display = anyChecked ? 'flex' : 'none';
@@ -177,21 +179,17 @@ function updateActionButtons() {
 function toggleEditMode() {
   const editModeElements = document.querySelectorAll('.edit-mode');
   const isVisible = editModeElements[0].style.display !== 'none' && editModeElements[0].style.display !== '';
-  
   // Show or hide all the edit mode things (checkboxes and buttons)
   editModeElements.forEach(el => {
     el.style.display = isVisible ? 'none' : 'inline-block';
   });
-  
   // Hide the action buttons when you turn off edit mode
   if (editActions) editActions.style.display = 'none';
   if (deleteActions) deleteActions.style.display = 'none';
-  
   // Change the button text to show what it will do
-  editToggle.innerHTML = isVisible ? '✏️ Edit Mode' : '❌ Cancel Edit';
-  
+  if (editToggle) editToggle.innerHTML = isVisible ? '✏️ Edit Mode' : '❌ Cancel Edit';
   // Uncheck all the boxes when you turn off edit mode
-  checkboxes.forEach(checkbox => {
+  if (checkboxes) checkboxes.forEach(checkbox => {
     checkbox.checked = false;
   });
 }

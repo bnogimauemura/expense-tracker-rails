@@ -1,0 +1,32 @@
+<div style="max-width: 400px; margin: 40px auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+  <div style="text-align: center; margin-bottom: 30px;">
+    <h1 style="margin: 0; font-size: 28px; color: #333; font-weight: 600;">Reset Your Password</h1>
+    <p style="margin: 10px 0 0 0; color: #666; font-size: 16px;">Enter your email to receive reset instructions</p>
+  </div>
+
+  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+
+    <div style="margin-bottom: 30px;">
+      <%= f.label :email, "Email Address", style: "display: block; margin-bottom: 8px; font-weight: 500; color: #333;" %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email",
+          style: "width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 16px; box-sizing: border-box; transition: border-color 0.2s;",
+          placeholder: "Enter your email address" %>
+    </div>
+
+    <div style="text-align: center;">
+      <%= f.submit "Send Reset Instructions", style: "background: #007bff; color: white; border: none; padding: 14px 30px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; transition: background-color 0.2s;" %>
+    </div>
+  <% end %>
+
+  <div style="text-align: center; margin-top: 25px; padding-top: 25px; border-top: 1px solid #e1e5e9;">
+    <p style="margin: 0 0 15px 0; color: #666; font-size: 14px;">
+      Remember your password? 
+      <a href="<%= new_user_session_path %>" style="color: #007bff; text-decoration: none; font-weight: 500;">Sign in here</a>
+    </p>
+    <p style="margin: 0; color: #666; font-size: 14px;">
+      Don't have an account? 
+      <a href="<%= new_user_registration_path %>" style="color: #28a745; text-decoration: none; font-weight: 500;">Create one here</a>
+    </p>
+  </div>
+</div>

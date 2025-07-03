@@ -1,0 +1,124 @@
+<div style="max-width: 400px; margin: 40px auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+  <div style="text-align: center; margin-bottom: 30px;">
+    <h1 style="margin: 0; font-size: 28px; color: #333; font-weight: 600;">Create Your Account</h1>
+    <p style="margin: 10px 0 0 0; color: #666; font-size: 16px;">Start tracking your expenses today!</p>
+  </div>
+
+  <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+    <% name_error = resource.errors[:name].first %>
+    <% email_error = resource.errors[:email].first %>
+    <% password_error = resource.errors[:password].first %>
+    <% password_confirmation_error = resource.errors[:password_confirmation].first %>
+
+    <div style="margin-bottom: 20px;">
+      <%= f.label :name, "Name", style: "display: block; margin-bottom: 8px; font-weight: 500; color: #333;" %>
+      <%= f.text_field :name, autofocus: true, autocomplete: "name",
+          style: "width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 16px; box-sizing: border-box; transition: border-color 0.2s;",
+          placeholder: "Enter your name", id: "user_name" %>
+      <div id="name-error-msg" style="color: #dc3545; font-size: 14px; margin-top: 4px; display: none;"></div>
+      <% if name_error %>
+        <div style="color: #dc3545; font-size: 14px; margin-top: 4px;"> <%= name_error %> </div>
+      <% end %>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <%= f.label :email, "Email Address", style: "display: block; margin-bottom: 8px; font-weight: 500; color: #333;" %>
+      <%= f.email_field :email, autocomplete: "email", 
+          style: "width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 16px; box-sizing: border-box; transition: border-color 0.2s;",
+          placeholder: "Enter your email address", id: "user_email" %>
+      <div id="email-error-msg" style="color: #dc3545; font-size: 14px; margin-top: 4px; display: none;"></div>
+      <% if email_error %>
+        <div style="color: #dc3545; font-size: 14px; margin-top: 4px;"> <%= email_error %> </div>
+      <% end %>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <%= f.label :password, "Password", style: "display: block; margin-bottom: 8px; font-weight: 500; color: #333;" %>
+      <% if @minimum_password_length %>
+        <small style="color: #666; font-size: 14px;">(At least <%= @minimum_password_length %> characters)</small>
+      <% end %>
+      <%= f.password_field :password, autocomplete: "new-password",
+          style: "width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 16px; box-sizing: border-box; transition: border-color 0.2s; margin-top: 5px;",
+          placeholder: "Create a strong password", id: "user_password" %>
+      <div id="password-error-msg" style="color: #dc3545; font-size: 14px; margin-top: 4px; display: none;"></div>
+      <% if password_error %>
+        <div style="color: #dc3545; font-size: 14px; margin-top: 4px;"> <%= password_error %> </div>
+      <% end %>
+    </div>
+
+    <div style="margin-bottom: 30px;">
+      <%= f.label :password_confirmation, "Confirm Password", style: "display: block; margin-bottom: 8px; font-weight: 500; color: #333;" %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password",
+          style: "width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 16px; box-sizing: border-box; transition: border-color 0.2s;",
+          placeholder: "Type your password again", id: "user_password_confirmation" %>
+      <div id="pw-match-msg" style="color: #dc3545; font-size: 14px; margin-top: 4px; display: none;"></div>
+      <% if password_confirmation_error %>
+        <div style="color: #dc3545; font-size: 14px; margin-top: 4px;"> <%= password_confirmation_error %> </div>
+      <% end %>
+    </div>
+
+    <div style="text-align: center;">
+      <%= f.submit "Create Account", style: "background: #28a745; color: white; border: none; padding: 14px 30px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; transition: background-color 0.2s;" %>
+    </div>
+  <% end %>
+
+  <div style="text-align: center; margin-top: 25px; padding-top: 25px; border-top: 1px solid #e1e5e9;">
+    <p style="margin: 0; color: #666; font-size: 14px;">
+      Already have an account? 
+      <a href="<%= new_user_session_path %>" style="color: #007bff; text-decoration: none; font-weight: 500;">Sign in here</a>
+    </p>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      function setInputBorder(input, valid) {
+        input.style.borderColor = valid ? '#28a745' : '#dc3545';
+      }
+      // Name validation: not empty
+      var nameInput = document.getElementById('user_name');
+      var nameErrorMsg = document.getElementById('name-error-msg');
+      nameInput.addEventListener('input', function(e) {
+        var valid = e.target.value.trim().length > 0;
+        setInputBorder(e.target, valid);
+        if (!valid) {
+          nameErrorMsg.textContent = "Name can't be blank";
+          nameErrorMsg.style.display = 'block';
+        } else {
+          nameErrorMsg.textContent = '';
+          nameErrorMsg.style.display = 'none';
+        }
+      });
+      // Email validation: simple regex
+      var emailInput = document.getElementById('user_email');
+      var emailErrorMsg = document.getElementById('email-error-msg');
+      emailInput.addEventListener('input', function(e) {
+        var valid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e.target.value);
+        setInputBorder(e.target, valid);
+        emailErrorMsg.style.display = 'none';
+      });
+      // Password validation: min length
+      var pwInput = document.getElementById('user_password');
+      var pwErrorMsg = document.getElementById('password-error-msg');
+      pwInput.addEventListener('input', function(e) {
+        var valid = e.target.value.length >= <%= @minimum_password_length || 6 %>;
+        setInputBorder(e.target, valid);
+        pwErrorMsg.style.display = 'none';
+      });
+      // Password confirmation: matches password
+      var pwConfInput = document.getElementById('user_password_confirmation');
+      var pwMatchMsg = document.getElementById('pw-match-msg');
+      pwConfInput.addEventListener('input', function(e) {
+        var pw = pwInput.value;
+        var match = e.target.value === pw && pw.length >= <%= @minimum_password_length || 6 %>;
+        setInputBorder(e.target, match);
+        if (!match && e.target.value.length > 0) {
+          pwMatchMsg.textContent = 'Passwords do not match';
+          pwMatchMsg.style.display = 'block';
+        } else {
+          pwMatchMsg.textContent = '';
+          pwMatchMsg.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</div>
