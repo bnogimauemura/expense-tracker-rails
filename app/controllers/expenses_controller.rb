@@ -1,9 +1,15 @@
+require 'ostruct'
+
 class ExpensesController < ApplicationController
     # Main page - shows current month expenses and adds up the total
     def index
-        # Get only current month expenses
-        @expenses = Expense.current_month.order(date: :desc)
-        @total_price = @expenses.sum(:price)
+        if user_signed_in?
+            @expenses = current_user.expenses.current_month.order(date: :desc)
+        else
+            session[:guest_expenses] ||= []
+            @expenses = session[:guest_expenses].map { |e| OpenStruct.new(e) }
+        end
+        @total_price = @expenses.sum { |e| e.price.to_f }
 
         # Get category totals for the current month
         @category_totals = Expense.total_by_category(@expenses)
@@ -20,29 +26,49 @@ class ExpensesController < ApplicationController
 
     # When you click "Save" on the new expense form
     def create
-        @expense = Expense.new(expense_params)  # Make a new expense with the info you typed
-        if @expense.save
-            redirect_to expenses_path, notice: "Expense added successfully."
+        if user_signed_in?
+            @expense = Expense.new(expense_params)  # Make a new expense with the info you typed
+            @expense.user = current_user
+            if @expense.save
+                redirect_to expenses_path, notice: "Expense added successfully."
+            else
+                render :new  # Show the form again if something went wrong
+            end
         else
-            render :new  # Show the form again if something went wrong
+            session[:guest_expenses] ||= []
+            guest_expense = expense_params.to_h
+            guest_expense["id"] = SecureRandom.uuid
+            session[:guest_expenses] << guest_expense
+            redirect_to expenses_path, notice: "Expense added successfully."
         end
     end
 
     # Shows the page where you can edit several expenses at once
     # This happens when you check some boxes and click "Edit Selected"
     def edit_multiple
-        # Find all the expenses you checked
-        @expenses = Expense.where(id: params[:selected_ids])
+        if user_signed_in?
+            @expenses = current_user.expenses.where(id: params[:selected_ids])
+        else
+            session[:guest_expenses] ||= []
+            ids = Array(params[:selected_ids])
+            @expenses = session[:guest_expenses].select { |e| ids.include?(e["id"]) }.map { |e| OpenStruct.new(e) }
+        end
     end
 
     # When you click "Save All Changes" on the edit page
     # This updates all the expenses you changed
     def update_multiple
-        # Go through each expense you edited
-        params[:expenses].each do |id, attributes|
-            expense = Expense.find(id)  # Find the specific expense
-            # Save the changes you made (only the safe ones)
-            expense.update(attributes.permit(:date, :description, :price, :category))
+        if user_signed_in?
+            params[:expenses].each do |id, attributes|
+                expense = current_user.expenses.find_by(id: id)
+                expense&.update(attributes.permit(:date, :description, :price, :category))
+            end
+        else
+            session[:guest_expenses] ||= []
+            params[:expenses].each do |id, attributes|
+                idx = session[:guest_expenses].index { |e| e["id"] == id }
+                session[:guest_expenses][idx].merge!(attributes.to_h) if idx
+            end
         end
         redirect_to expenses_path, notice: "Expenses updated successfully."
     end
@@ -50,10 +76,14 @@ class ExpensesController < ApplicationController
     # When you click "Delete Selected" button
     # This removes all the expenses you checked
     def destroy_multiple
-        # The IDs come as a list separated by commas from the webpage
-        # Split them up and clean them
-        selected_ids = params[:selected_ids].to_s.split(",").map(&:strip).reject(&:blank?)
-        Expense.where(id: selected_ids).destroy_all  # Delete all the selected expenses
+        if user_signed_in?
+            selected_ids = params[:selected_ids].to_s.split(",").map(&:strip).reject(&:blank?)
+            current_user.expenses.where(id: selected_ids).destroy_all  # Delete all the selected expenses
+        else
+            session[:guest_expenses] ||= []
+            selected_ids = params[:selected_ids].to_s.split(",").map(&:strip).reject(&:blank?)
+            session[:guest_expenses].delete_if { |e| selected_ids.include?(e["id"]) }
+        end
         redirect_to expenses_path, notice: "Selected expenses deleted successfully."
     end
 

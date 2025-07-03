@@ -1,4 +1,9 @@
 Rails.application.routes.draw do
+  devise_for :users, controllers: { registrations: 'users/registrations', sessions: 'users/sessions' }
+  devise_scope :user do
+    get 'users/password/edit_logged_in', to: 'users/registrations#edit_password', as: :edit_logged_in_user_password
+    patch 'users/password/update_logged_in', to: 'users/registrations#update_password', as: :update_logged_in_user_password
+  end
   # A simple page to check if the website is working
   get "up" => "rails/health#show", as: :rails_health_check
 

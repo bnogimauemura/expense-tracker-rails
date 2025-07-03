@@ -23,6 +23,49 @@
   </head>
 
   <body>
-    <%= yield %>
+    <!-- Flash Pop-up Message -->
+    <% if notice || alert %>
+      <div id="flash-popup" style="position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%); min-width: 300px; max-width: 90vw; z-index: 9999; padding: 18px 32px; border-radius: 8px; font-size: 16px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.15); background: <%= notice ? '#d4edda' : '#f8d7da' %>; color: <%= notice ? '#155724' : '#721c24' %>; border: 1px solid <%= notice ? '#c3e6cb' : '#f5c6cb' %>; text-align: center; display: flex; align-items: center; gap: 10px;">
+        <span><%= notice || alert %></span>
+      </div>
+      <script>
+        setTimeout(function() {
+          var popup = document.getElementById('flash-popup');
+          if (popup) popup.style.display = 'none';
+        }, 5000);
+      </script>
+    <% end %>
+    
+    <!-- Clean Navigation Header -->
+    <header style="background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 15px 0; margin-bottom: 20px;">
+      <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <a href="<%= root_path %>" style="text-decoration: none; color: inherit;">
+            <h1 style="margin: 0; font-size: 24px; color: #333; font-weight: 600; cursor: pointer; transition: color 0.2s;">💰 Expense Tracker</h1>
+          </a>
+        </div>
+        
+        <div style="display: flex; gap: 15px; align-items: center;">
+          <% if user_signed_in? %>
+            <!-- User is logged in - show welcome and options -->
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <span style="color: #666; font-size: 18px;">Welcome back, <%= current_user.name.presence || current_user.email %>!</span>
+              <a href="<%= edit_user_registration_path %>" style="color: #007bff; text-decoration: none; font-size: 18px; transition: all 0.2s;">Settings</a>
+              <%= button_to "Sign Out", destroy_user_session_path, method: :delete, style: "background: #dc3545; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: all 0.2s;" %>
+            </div>
+          <% else %>
+            <!-- User is not logged in - show clear options -->
+            <div style="display: flex; gap: 10px;">
+              <a href="<%= new_user_session_path %>" style="text-decoration: none; color: #007bff; padding: 8px 16px; border: 1px solid #007bff; border-radius: 6px; font-size: 14px; transition: all 0.2s;">Sign In</a>
+              <a href="<%= new_user_registration_path %>" style="text-decoration: none; background: #28a745; color: white; padding: 8px 16px; border-radius: 6px; font-size: 14px; transition: all 0.2s;">Create Account</a>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </header>
+    
+    <main style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+      <%= yield %>
+    </main>
   </body>
 </html>

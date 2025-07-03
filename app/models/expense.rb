@@ -1,4 +1,6 @@
 class Expense < ApplicationRecord
+  belongs_to :user
+  
   # Predefined categories for consistent categorization
   CATEGORIES = [
     "Food & Dining",
@@ -26,14 +28,24 @@ class Expense < ApplicationRecord
 
   # Helper methods
   def self.total_by_category(expenses = all)
-    expenses.reorder(nil).group(:category).sum(:price)
+    if expenses.is_a?(ActiveRecord::Relation)
+      expenses.reorder(nil).group(:category).sum(:price)
+    else
+      # Array of hashes or OpenStructs
+      expenses.group_by { |e| e.category }.transform_values { |arr| arr.sum { |e| e.price.to_f } }
+    end
   end
 
   def self.category_percentages(expenses = all)
-    total = expenses.sum(:price)
-    return {} if total.zero?
-
-    expenses.reorder(nil).group(:category).sum(:price).transform_values { |amount| (amount / total.to_f * 100).round(1) }
+    if expenses.is_a?(ActiveRecord::Relation)
+      total = expenses.sum(:price)
+      return {} if total.zero?
+      expenses.reorder(nil).group(:category).sum(:price).transform_values { |amount| (amount / total.to_f * 100).round(1) }
+    else
+      total = expenses.sum { |e| e.price.to_f }
+      return {} if total.zero?
+      expenses.group_by { |e| e.category }.transform_values { |arr| ((arr.sum { |e| e.price.to_f } / total.to_f) * 100).round(1) }
+    end
   end
 
   # Returns an array of hashes for each past month of the current year with totals
