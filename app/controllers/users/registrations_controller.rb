@@ -63,16 +63,16 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # end
 
   def edit_password
-    render 'devise/registrations/edit_password'
+    render "devise/registrations/edit_password"
   end
 
   def update_password
     @user = current_user
     if @user.update_with_password(password_update_params)
       bypass_sign_in(@user)
-      redirect_to edit_user_registration_path, notice: 'Password updated successfully.'
+      redirect_to edit_user_registration_path, notice: "Password updated successfully."
     else
-      render 'devise/registrations/edit_password', status: :unprocessable_entity
+      render "devise/registrations/edit_password", status: :unprocessable_entity
     end
   end
 

@@ -1,6 +1,6 @@
 class Expense < ApplicationRecord
   belongs_to :user
-  
+
   # Predefined categories for consistent categorization
   CATEGORIES = [
     "Food & Dining",

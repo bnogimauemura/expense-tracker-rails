@@ -1,4 +1,4 @@
-require 'ostruct'
+require "ostruct"
 
 class ExpensesController < ApplicationController
     # Main page - shows current month expenses and adds up the total
