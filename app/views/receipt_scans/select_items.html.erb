@@ -1,0 +1,40 @@
+<div class="container" style="max-width: 600px; margin: 2rem auto; text-align: center;">
+  <h2>Select Items to Add as Expenses</h2>
+  <p>We found the following items on your receipt. Select the ones you want to add.</p>
+
+  <%= form_with url: handle_selection_receipt_scans_path, method: :post, local: true do |form| %>
+    <table style="width: 100%; margin-bottom: 1rem; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Description</th>
+          <th>Price</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @items.each_with_index do |item, idx| %>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td>
+              <%= check_box_tag "selected_items[]", idx, true, id: "item_#{idx}" %>
+            </td>
+            <td><%= item["name"] %></td>
+            <td>¥<%= item["price"] %></td>
+            <td><%= item["category"] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <div style="margin-bottom: 1rem;">
+      <button type="button" onclick="selectAll(true)">Select All</button>
+      <button type="button" onclick="selectAll(false)">Deselect All</button>
+    </div>
+    <%= form.submit "Add Selected as Expenses", class: "btn btn-primary" %>
+  <% end %>
+
+  <script>
+    function selectAll(checked) {
+      document.querySelectorAll('input[type=checkbox][id^=item_]').forEach(cb => cb.checked = checked);
+    }
+  </script>
+</div> 

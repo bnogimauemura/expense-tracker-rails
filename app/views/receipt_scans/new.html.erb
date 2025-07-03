@@ -1,0 +1,11 @@
+<div class="container" style="max-width: 400px; margin: 2rem auto; text-align: center;">
+  <h2>Scan Receipt</h2>
+  <p>Upload or take a photo of your receipt. We'll extract the details for you!</p>
+
+  <%= form_with url: receipt_scans_path, local: true, html: { multipart: true } do |form| %>
+    <div style="margin-bottom: 1rem;">
+      <%= form.file_field :image, accept: 'image/*', capture: 'environment', required: true, style: 'width: 100%;' %>
+    </div>
+    <%= form.submit "Scan Receipt", class: "btn btn-primary" %>
+  <% end %>
+</div> 
