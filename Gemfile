@@ -36,6 +36,19 @@ gem "thruster", require: false
 # Use Devise for authentication [https://github.com/heartcombo/devise]
 gem "devise"
 
+# Add mini_magick gem for image resizing before sending to OpenAI
+gem "mini_magick"
+
+# Add ruby-openai gem for easy OpenAI API integration
+# (Commented out due to version conflict with vision support)
+# gem "openai", ">= 5.0.0"
+
+# Use Faraday for direct HTTP requests to OpenAI API (for vision/image support)
+gem "faraday"
+
+# Load environment variables from .env file in development and test
+gem "dotenv-rails", groups: [:development, :test]
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

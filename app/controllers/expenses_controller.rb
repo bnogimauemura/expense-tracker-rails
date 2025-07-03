@@ -87,6 +87,38 @@ class ExpensesController < ApplicationController
         redirect_to expenses_path, notice: "Selected expenses deleted successfully."
     end
 
+    def new_multiple
+        items = session[:selected_receipt_items] || []
+        if items.empty?
+            flash[:alert] = "No receipt items to add. Please scan a receipt first."
+            return redirect_to expenses_path
+        end
+        @expenses = items.map do |item|
+            Expense.new(
+                description: item["name"],
+                price: item["price"],
+                category: item["category"],
+                date: item["date"] || Date.current
+            )
+        end
+    end
+
+    def create_multiple
+        expense_params = params[:expenses] || []
+        @expenses = expense_params.map do |exp|
+            current_user.expenses.build(exp.permit(:description, :price, :category, :date))
+        end
+        if @expenses.all?(&:valid?)
+            @expenses.each(&:save!)
+            session.delete(:selected_receipt_items)
+            flash[:notice] = "Expenses added successfully!"
+            redirect_to expenses_path
+        else
+            flash.now[:alert] = "Please correct the errors below."
+            render :new_multiple, status: :unprocessable_entity
+        end
+    end
+
     private
 
     # Safety check: Only allow these specific fields to be saved

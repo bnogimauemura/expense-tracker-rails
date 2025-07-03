@@ -1,0 +1,30 @@
+<div class="container" style="max-width: 700px; margin: 2rem auto;">
+  <h2>Review and Add Expenses</h2>
+  <p>Please review and edit the details below before saving your expenses.</p>
+
+  <%= form_with url: create_multiple_expenses_path, method: :post, local: true do |form| %>
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem;">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Price</th>
+          <th>Category</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @expenses.each_with_index do |expense, idx| %>
+          <tr style="border-bottom: 1px solid #eee;">
+            <td><%= text_field_tag "expenses[][description]", expense.description, required: true, style: 'width: 100%;' %></td>
+            <td><%= number_field_tag "expenses[][price]", expense.price, required: true, min: 1, style: 'width: 80px;' %></td>
+            <td>
+              <%= select_tag "expenses[][category]", options_for_select(Expense::CATEGORIES, expense.category), required: true %>
+            </td>
+            <td><%= date_field_tag "expenses[][date]", expense.date, required: true, style: 'width: 130px;' %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <%= form.submit "Save All Expenses", class: "btn btn-primary" %>
+  <% end %>
+</div> 

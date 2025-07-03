@@ -25,4 +25,11 @@ Rails.application.routes.draw do
   root "expenses#index"
 
   # Removed temporary cleanup route
+
+  resources :receipt_scans, only: [:new, :create]
+  get "receipt_scans/select_items", to: "receipt_scans#select_items", as: :select_items_receipt_scans
+  post "receipt_scans/handle_selection", to: "receipt_scans#handle_selection", as: :handle_selection_receipt_scans
+
+  get "expenses/new_multiple", to: "expenses#new_multiple", as: :new_multiple_expenses
+  post "expenses/create_multiple", to: "expenses#create_multiple", as: :create_multiple_expenses
 end
