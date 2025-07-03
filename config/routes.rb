@@ -23,4 +23,8 @@ Rails.application.routes.draw do
 
   # Make the expense list the main page when you visit the website
   root "expenses#index"
+
+  if Rails.env.production?
+    get '/admin/cleanup_orphan_expenses', to: 'admin#cleanup_orphan_expenses'
+  end
 end
