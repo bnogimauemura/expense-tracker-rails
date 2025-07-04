@@ -1,30 +1,59 @@
-<div class="container" style="max-width: 700px; margin: 2rem auto;">
-  <h2>Review and Add Expenses</h2>
-  <p>Please review and edit the details below before saving your expenses.</p>
+<div class="container">
+  <!-- Header section matching the main app style -->
+  <div class="header fade-in">
+    <h1>✏️ Review Expenses</h1>
+    <p>Please review and edit the details below before saving your expenses.</p>
+  </div>
 
-  <%= form_with url: create_multiple_expenses_path, method: :post, local: true do |form| %>
-    <table style="width: 100%; border-collapse: collapse; margin-bottom: 1rem;">
-      <thead>
-        <tr>
-          <th>Description</th>
-          <th>Price</th>
-          <th>Category</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @expenses.each_with_index do |expense, idx| %>
-          <tr style="border-bottom: 1px solid #eee;">
-            <td><%= text_field_tag "expenses[][description]", expense.description, required: true, style: 'width: 100%;' %></td>
-            <td><%= number_field_tag "expenses[][price]", expense.price, required: true, min: 1, style: 'width: 80px;' %></td>
-            <td>
-              <%= select_tag "expenses[][category]", options_for_select(Expense::CATEGORIES, expense.category), required: true %>
-            </td>
-            <td><%= date_field_tag "expenses[][date]", expense.date, required: true, style: 'width: 130px;' %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-    <%= form.submit "Save All Expenses", class: "btn btn-primary" %>
-  <% end %>
+  <!-- Review and edit card -->
+  <div class="category-overview fade-in">
+    <h3>📝 Edit Expense Details</h3>
+    
+    <%= form_with url: create_multiple_expenses_path, method: :post, local: true do |form| %>
+      <div class="expenses-scroll-area" style="max-height: 500px;">
+        <table class="receipt-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th style="text-align: right; width: 120px;">Price</th>
+              <th style="width: 140px;">Category</th>
+              <th style="text-align: center; width: 140px;">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @expenses.each_with_index do |expense, idx| %>
+              <tr>
+                <td>
+                  <%= text_field_tag "expenses[][description]", 
+                      expense.description, 
+                      required: true %>
+                </td>
+                <td style="text-align: right;">
+                  <%= number_field_tag "expenses[][price]", 
+                      expense.price, 
+                      required: true, 
+                      min: 1 %>
+                </td>
+                <td>
+                  <%= select_tag "expenses[][category]", 
+                      options_for_select(Expense::CATEGORIES, expense.category), 
+                      required: true %>
+                </td>
+                <td style="text-align: center;">
+                  <%= date_field_tag "expenses[][date]", 
+                      expense.date, 
+                      required: true %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="action-bar" style="justify-content: center; margin-top: 1.5rem;">
+        <%= form.submit "💾 Save All Expenses", class: "btn btn-primary", style: "font-size: 1.1rem; padding: 1rem 2rem;" %>
+        <%= link_to "← Back to Selection", select_items_receipt_scans_path, class: "btn btn-secondary" %>
+      </div>
+    <% end %>
+  </div>
 </div> 
