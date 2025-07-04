@@ -585,3 +585,116 @@ textarea {
   font-size: 1.1rem;
   padding: 0.75rem 1rem;
 }
+
+/* Receipt Scanning Specific Styles */
+.receipt-upload-area {
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  background: var(--background-color);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.receipt-upload-area:hover {
+  border-color: var(--primary-color);
+  background: #f0f7ff;
+}
+
+.receipt-upload-area input[type="file"] {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Table Styles for Receipt Scanning */
+.receipt-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.receipt-table th {
+  background: var(--background-color);
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.receipt-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s ease;
+}
+
+.receipt-table tr:hover {
+  background: var(--background-color);
+}
+
+.receipt-table input[type="text"],
+.receipt-table input[type="number"],
+.receipt-table input[type="date"],
+.receipt-table select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 1rem;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.receipt-table input[type="text"]:focus,
+.receipt-table input[type="number"]:focus,
+.receipt-table input[type="date"]:focus,
+.receipt-table select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Category badges */
+.category-badge {
+  background: var(--background-color);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Checkbox styling */
+.receipt-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+  .receipt-table {
+    font-size: 0.9rem;
+  }
+  
+  .receipt-table th,
+  .receipt-table td {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .receipt-table input[type="text"],
+  .receipt-table input[type="number"],
+  .receipt-table input[type="date"],
+  .receipt-table select {
+    font-size: 0.9rem;
+    padding: 0.4rem;
+  }
+}

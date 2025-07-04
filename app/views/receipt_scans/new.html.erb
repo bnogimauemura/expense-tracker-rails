@@ -1,11 +1,26 @@
-<div class="container" style="max-width: 400px; margin: 2rem auto; text-align: center;">
-  <h2>Scan Receipt</h2>
-  <p>Upload or take a photo of your receipt. We'll extract the details for you!</p>
+<div class="container">
+  <!-- Header section matching the main app style -->
+  <div class="header fade-in">
+    <h1>🧾 Scan Receipt</h1>
+    <p>Upload or take a photo of your receipt. We'll extract the details for you!</p>
+  </div>
 
-  <%= form_with url: receipt_scans_path, local: true, html: { multipart: true } do |form| %>
-    <div style="margin-bottom: 1rem;">
-      <%= form.file_field :image, accept: 'image/*', capture: 'environment', required: true, style: 'width: 100%;' %>
+  <!-- Upload card with consistent styling -->
+  <div class="total-card fade-in" style="max-width: 500px; margin: 0 auto;">
+    <h2>📸 Upload Receipt</h2>
+    <div style="margin-bottom: 1.5rem;">
+      <%= form_with url: receipt_scans_path, local: true, html: { multipart: true } do |form| %>
+        <div class="receipt-upload-area" style="margin-bottom: 1.5rem;">
+          <%= form.file_field :image, 
+              accept: 'image/*', 
+              capture: 'environment', 
+              required: true %>
+        </div>
+        <div class="action-bar" style="justify-content: center;">
+          <%= form.submit "🔍 Scan Receipt", class: "btn btn-primary", style: "font-size: 1.1rem; padding: 1rem 2rem;" %>
+          <%= link_to "← Back to Expenses", root_path, class: "btn btn-secondary" %>
+        </div>
+      <% end %>
     </div>
-    <%= form.submit "Scan Receipt", class: "btn btn-primary" %>
-  <% end %>
+  </div>
 </div> 
