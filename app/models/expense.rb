@@ -50,12 +50,14 @@ class Expense < ApplicationRecord
   end
 
   # Returns an array of hashes for each past month of the current year with totals
-  def self.monthly_totals_up_to_now
+  def self.monthly_totals_up_to_now(user = nil)
     now = Date.current
     (1..now.month).map do |month|
+      scope = by_month(now.year, month)
+      scope = scope.where(user: user) if user
       {
         month: Date::MONTHNAMES[month],
-        total: by_month(now.year, month).sum(:price)
+        total: scope.sum(:price)
       }
     end
   end

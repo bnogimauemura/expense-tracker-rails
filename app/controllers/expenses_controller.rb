@@ -31,7 +31,7 @@ class ExpensesController < ApplicationController
         @category_percentages = Expense.category_percentages(@expenses)
 
         # Get monthly totals for each past month of the current year
-        @monthly_totals = Expense.monthly_totals_up_to_now
+        @monthly_totals = Expense.monthly_totals_up_to_now(user_signed_in? ? current_user : nil)
     end
 
     # Shows the page where you can add a new expense
