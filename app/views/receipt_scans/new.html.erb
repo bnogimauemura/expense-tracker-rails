@@ -2,7 +2,7 @@
   <!-- Header section matching the main app style -->
   <div class="header fade-in">
     <h1>🧾 Scan Receipt</h1>
-    <p>Upload or take a photo of your receipt. We'll extract the details for you!</p>
+    <p>Take a photo or choose from your gallery. We'll extract the details for you!</p>
   </div>
 
   <!-- Upload card with consistent styling -->
@@ -13,7 +13,6 @@
         <div class="receipt-upload-area" style="margin-bottom: 1.5rem;">
           <%= form.file_field :image, 
               accept: 'image/*', 
-              capture: 'environment', 
               required: true %>
         </div>
         <div class="action-bar" style="justify-content: center;">
