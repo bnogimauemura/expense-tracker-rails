@@ -7,11 +7,11 @@ class ReportsController < ApplicationController
     first_visit_detector = FirstVisitDetectorService.new(current_user)
     is_first_visit = first_visit_detector.update_visit_date!
     should_show_report = first_visit_detector.should_show_monthly_report?
-    
+
     # Get monthly comparison data
     spending_service = MonthlySpendingService.new(current_user)
     comparison_data = spending_service.monthly_comparison
-    
+
     render json: {
       success: true,
       data: {
@@ -22,4 +22,4 @@ class ReportsController < ApplicationController
       }
     }
   end
-end 
+end

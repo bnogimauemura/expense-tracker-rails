@@ -22,7 +22,7 @@ module ExpensesHelper
   # Format percentage change
   def format_percentage_change(percentage)
     return "0%" if percentage.zero?
-    
+
     direction = percentage > 0 ? "+" : ""
     "#{direction}#{percentage}%"
   end
@@ -38,22 +38,22 @@ module ExpensesHelper
     amount = format_currency(data[:last_month])
     change = format_percentage_change(data[:change_percentage])
     previous_month = data[:past_past_month]
-    
+
     "#{emoji} #{category}: #{amount} (#{change} from #{previous_month})"
   end
 
   # Generate the full monthly report text
   def generate_monthly_report_text(comparison_data)
     return "No data available" unless comparison_data && comparison_data[:categories]
-    
+
     lines = []
     lines << "#{comparison_data[:last_month]} Report Card"
     lines << ""
-    
+
     comparison_data[:categories].each do |category, data|
       lines << format_category_line(category, data)
     end
-    
+
     lines.join("\n")
   end
 
