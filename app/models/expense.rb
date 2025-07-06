@@ -53,11 +53,16 @@ class Expense < ApplicationRecord
   def self.monthly_totals_up_to_now(user = nil)
     now = Date.current
     (1..now.month).map do |month|
-      scope = by_month(now.year, month)
-      scope = scope.where(user: user) if user
+      if user
+        scope = by_month(now.year, month).where(user: user)
+        total = scope.sum(:price)
+      else
+        # For guest users, return 0 for all months
+        total = 0
+      end
       {
         month: Date::MONTHNAMES[month],
-        total: scope.sum(:price)
+        total: total
       }
     end
   end
