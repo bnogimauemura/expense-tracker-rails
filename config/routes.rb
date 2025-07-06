@@ -12,6 +12,7 @@ Rails.application.routes.draw do
 
   # Temporary route for testing monthly report modal
   get "reset_visit_date", to: "application#reset_visit_date", as: :reset_visit_date
+  get "test_route", to: "application#test_route", as: :test_route
 
   # Special routes for editing and deleting many expenses at once
   # These must come BEFORE the normal routes so they work properly

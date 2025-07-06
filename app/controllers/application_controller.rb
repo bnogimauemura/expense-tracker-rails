@@ -20,4 +20,9 @@ class ApplicationController < ActionController::Base
       redirect_to expenses_path, alert: "Please log in first."
     end
   end
+
+  # Simple test route
+  def test_route
+    render plain: "Test route works!"
+  end
 end
