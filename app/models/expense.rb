@@ -4,6 +4,7 @@ class Expense < ApplicationRecord
   # Predefined categories for consistent categorization
   CATEGORIES = [
     "Food & Dining",
+    "Beverage/Drink",
     "Transportation",
     "Shopping",
     "Entertainment",

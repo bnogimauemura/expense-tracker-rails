@@ -12,6 +12,51 @@
     <div class="amount">¥<%= number_with_delimiter(@total_price) %></div>
   </div>
 
+  <!-- Monthly Report Modal - shown only on first visit of the month -->
+  <% if user_signed_in? && @should_show_monthly_report && @monthly_comparison %>
+    <div id="monthly-report-modal" class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>📊 <%= @report_month %> Report Card</h3>
+          <button class="modal-close" onclick="closeMonthlyReport()">
+            <span class="close-icon">×</span>
+            <span class="close-text">dismiss</span>
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <% if @monthly_comparison[:categories].any? %>
+            <div class="report-categories">
+              <% @monthly_comparison[:categories].each do |category, data| %>
+                <div class="report-category-item">
+                  <span class="category-emoji"><%= category_emoji(category) %></span>
+                  <span class="category-name"><%= category %></span>
+                  <span class="category-amount"><%= format_currency(data[:last_month]) %></span>
+                  <span class="category-change <%= change_direction_class(data[:change_percentage]) %>">
+                    (<%= format_percentage_change(data[:change_percentage]) %> from <%= @monthly_comparison[:past_past_month] %>)
+                  </span>
+                </div>
+              <% end %>
+            </div>
+            
+            <div class="report-summary">
+              <div class="summary-total">
+                <strong>Total: <%= format_currency(@monthly_comparison[:last_month_total]) %></strong>
+                <span class="summary-change <%= change_direction_class(@monthly_comparison[:total_change_percentage]) %>">
+                  (<%= format_percentage_change(@monthly_comparison[:total_change_percentage]) %> from <%= @monthly_comparison[:past_past_month] %>)
+                </span>
+              </div>
+            </div>
+          <% else %>
+            <div class="no-data-message">
+              <p>No expenses to compare for <%= @report_month %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
   <!-- Category breakdown with graph -->
   <% if @category_totals.any? %>
     <div class="category-overview fade-in">
@@ -225,4 +270,31 @@ document.addEventListener('DOMContentLoaded', () => {
     element.style.animationDelay = `${index * 0.1}s`;
   });
 });
+
+// Close the monthly report modal
+function closeMonthlyReport() {
+  const modal = document.getElementById('monthly-report-modal');
+  if (modal) {
+    modal.style.animation = 'fadeOut 0.3s ease-out';
+    setTimeout(() => {
+      modal.remove();
+    }, 300);
+  }
+}
+
+// Add fadeOut animation for modal closing
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.95);
+    }
+  }
+`;
+document.head.appendChild(style);
 </script>

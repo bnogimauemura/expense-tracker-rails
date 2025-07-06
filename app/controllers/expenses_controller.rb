@@ -1,10 +1,25 @@
 require "ostruct"
+require_relative "../services/first_visit_detector_service"
+require_relative "../services/monthly_spending_service"
 
 class ExpensesController < ApplicationController
     # Main page - shows current month expenses and adds up the total
     def index
         if user_signed_in?
             @expenses = current_user.expenses.current_month.order(date: :desc)
+            
+            # Get monthly report data
+            first_visit_detector = FirstVisitDetectorService.new(current_user)
+            @should_show_monthly_report = first_visit_detector.should_show_monthly_report?
+            @report_month = first_visit_detector.report_month_name
+            
+            if @should_show_monthly_report
+                spending_service = MonthlySpendingService.new(current_user)
+                @monthly_comparison = spending_service.monthly_comparison
+            end
+            
+            # Update visit date after checking if we should show the report
+            @is_first_visit = first_visit_detector.update_visit_date!
         else
             session[:guest_expenses] ||= []
             @expenses = session[:guest_expenses].map { |e| OpenStruct.new(e) }

@@ -7,6 +7,9 @@ Rails.application.routes.draw do
   # A simple page to check if the website is working
   get "up" => "rails/health#show", as: :rails_health_check
 
+  # Reports API
+  get "reports/monthly_comparison", to: "reports#monthly_comparison", as: :monthly_comparison_report
+
   # Special routes for editing and deleting many expenses at once
   # These must come BEFORE the normal routes so they work properly
   # - Shows the page where you can edit several expenses
