@@ -23,6 +23,6 @@ class ApplicationController < ActionController::Base
 
   # Simple test route
   def test_route
-    render plain: "Test route works!"
+    render html: "<h1>Test route works!</h1>".html_safe
   end
 end
