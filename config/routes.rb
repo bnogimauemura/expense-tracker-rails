@@ -10,6 +10,9 @@ Rails.application.routes.draw do
   # Reports API
   get "reports/monthly_comparison", to: "reports#monthly_comparison", as: :monthly_comparison_report
 
+  # Temporary route for testing monthly report modal
+  get "reset_visit_date", to: "application#reset_visit_date", as: :reset_visit_date
+
   # Special routes for editing and deleting many expenses at once
   # These must come BEFORE the normal routes so they work properly
   # - Shows the page where you can edit several expenses
