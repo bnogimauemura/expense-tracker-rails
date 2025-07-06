@@ -11,6 +11,8 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.permit(:account_update, keys: [:name])
   end
 
+  public
+
   # Temporary route for testing monthly report modal
   def reset_visit_date
     if user_signed_in?
