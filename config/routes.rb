@@ -1,8 +1,4 @@
 Rails.application.routes.draw do
-  # Temporary routes for testing - placed at top to avoid conflicts
-  get "test_route", to: "application#test_route", as: :test_route
-  get "reset_visit_date", to: "application#reset_visit_date", as: :reset_visit_date
-
   devise_for :users, controllers: { registrations: "users/registrations", sessions: "users/sessions" }
   devise_scope :user do
     get "users/password/edit_logged_in", to: "users/registrations#edit_password", as: :edit_logged_in_user_password
