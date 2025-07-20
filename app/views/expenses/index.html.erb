@@ -327,22 +327,5 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   });
-  
-  // Keyboard navigation
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-      const activeDot = document.querySelector('.carousel-dot.active');
-      const currentIndex = Array.from(carouselDots).indexOf(activeDot);
-      
-      let newIndex;
-      if (e.key === 'ArrowLeft') {
-        newIndex = currentIndex > 0 ? currentIndex - 1 : carouselDots.length - 1;
-      } else {
-        newIndex = currentIndex < carouselDots.length - 1 ? currentIndex + 1 : 0;
-      }
-      
-      carouselDots[newIndex].click();
-    }
-  });
 });
 </script>
