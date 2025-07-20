@@ -6,184 +6,191 @@
     <p>Track your spending and stay organized</p>
   </div>
 
-  <!-- The big card that shows your total spending for current month -->
-  <div class="total-card fade-in">
-    <h2>Total Expenses - <%= Date.current.strftime('%B %Y') %></h2>
-    <div class="amount">¥<%= number_with_delimiter(@total_price) %></div>
+  <!-- Carousel Navigation -->
+  <div class="carousel-nav fade-in">
+    <div class="carousel-dots">
+      <button class="carousel-dot active" data-slide="dashboard" aria-label="Dashboard view">
+        <span class="dot-label">Dashboard</span>
+      </button>
+      <button class="carousel-dot" data-slide="monthly" aria-label="Monthly overview">
+        <span class="dot-label">Monthly Overview</span>
+      </button>
+    </div>
   </div>
 
-  <!-- Monthly Report Modal - shown only on first visit of the month -->
-  <% if user_signed_in? && @should_show_monthly_report && @monthly_comparison %>
-    <div id="monthly-report-modal" class="modal-overlay">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>📊 <%= @report_month %> Report Card</h3>
-          <button class="modal-close" onclick="closeMonthlyReport()">
-            <span class="close-icon">×</span>
-            <span class="close-text">dismiss</span>
-          </button>
-        </div>
-        
-        <div class="modal-body">
-          <% if @monthly_comparison[:categories].any? %>
-            <div class="report-categories">
-              <% @monthly_comparison[:categories].each do |category, data| %>
-                <div class="report-category-item">
-                  <span class="category-emoji"><%= category_emoji(category) %></span>
-                  <span class="category-name"><%= category %></span>
-                  <span class="category-amount"><%= format_currency(data[:last_month]) %></span>
-                  <span class="category-change <%= change_direction_class(data[:change_percentage]) %>">
-                    (<%= format_percentage_change(data[:change_percentage]) %> from <%= @monthly_comparison[:past_past_month] %>)
-                  </span>
+  <!-- Carousel Container -->
+  <div class="carousel-container">
+    <!-- Dashboard Slide -->
+    <div class="carousel-slide active" id="dashboard-slide">
+      <!-- The big card that shows your total spending for current month -->
+      <div class="total-card fade-in">
+        <h2>Total Expenses - <%= Date.current.strftime('%B %Y') %></h2>
+        <div class="amount">¥<%= number_with_delimiter(@total_price) %></div>
+      </div>
+
+      <!-- Monthly Report Modal - shown only on first visit of the month -->
+      <% if user_signed_in? && @should_show_monthly_report && @monthly_comparison %>
+        <div id="monthly-report-modal" class="modal-overlay">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>📊 <%= @report_month %> Report Card</h3>
+              <button class="modal-close" onclick="closeMonthlyReport()">
+                <span class="close-icon">×</span>
+                <span class="close-text">dismiss</span>
+              </button>
+            </div>
+            
+            <div class="modal-body">
+              <% if @monthly_comparison[:categories].any? %>
+                <div class="report-categories">
+                  <% @monthly_comparison[:categories].each do |category, data| %>
+                    <div class="report-category-item">
+                      <span class="category-emoji"><%= category_emoji(category) %></span>
+                      <span class="category-name"><%= category %></span>
+                      <span class="category-amount"><%= format_currency(data[:last_month]) %></span>
+                      <span class="category-change <%= change_direction_class(data[:change_percentage]) %>">
+                        (<%= format_percentage_change(data[:change_percentage]) %> from <%= @monthly_comparison[:past_past_month] %>)
+                      </span>
+                    </div>
+                  <% end %>
+                </div>
+                
+                <div class="report-summary">
+                  <div class="summary-total">
+                    <strong>Total: <%= format_currency(@monthly_comparison[:last_month_total]) %></strong>
+                    <span class="summary-change <%= change_direction_class(@monthly_comparison[:total_change_percentage]) %>">
+                      (<%= format_percentage_change(@monthly_comparison[:total_change_percentage]) %> from <%= @monthly_comparison[:past_past_month] %>)
+                    </span>
+                  </div>
+                </div>
+              <% else %>
+                <div class="no-data-message">
+                  <p>No expenses to compare for <%= @report_month %></p>
                 </div>
               <% end %>
             </div>
-            
-            <div class="report-summary">
-              <div class="summary-total">
-                <strong>Total: <%= format_currency(@monthly_comparison[:last_month_total]) %></strong>
-                <span class="summary-change <%= change_direction_class(@monthly_comparison[:total_change_percentage]) %>">
-                  (<%= format_percentage_change(@monthly_comparison[:total_change_percentage]) %> from <%= @monthly_comparison[:past_past_month] %>)
-                </span>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Category breakdown with graph -->
+      <% if @category_totals.any? %>
+        <div class="category-overview fade-in">
+          <h3>📊 Spending by Category</h3>
+          <div class="category-chart">
+            <% @category_totals.each do |category, total| %>
+              <% percentage = @category_percentages[category] || 0 %>
+              <div class="category-bar">
+                <div class="category-info">
+                  <div class="category-name"><%= category %></div>
+                  <div class="category-amount">¥<%= number_with_delimiter(total) %></div>
+                  <div class="category-percentage"><%= percentage %>%</div>
+                </div>
+                <div class="bar-container">
+                  <div class="bar" style="width: <%= percentage %>%"></div>
+                </div>
               </div>
-            </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- The main list where current month expenses are shown -->
+      <div class="expense-list fade-in">
+        <div class="expense-list-header flex-header">
+          <h3>📋 Your Expenses - <%= Date.current.strftime('%B %Y') %></h3>
+          <div class="header-actions">
+            <% if user_signed_in? %>
+              <div class="action-bar" style="margin-bottom: 1.5rem;">
+                <%= link_to '➕ Add Expense', new_expense_path, class: 'btn btn-primary' %>
+                <%= link_to '🧾 Scan Receipt', new_receipt_scan_path, class: 'btn btn-secondary' %>
+              </div>
+            <% end %>
+            <button onclick="toggleEditMode()" class="btn btn-secondary" id="edit-toggle">
+              ✏️ Edit Mode
+            </button>
+          </div>
+        </div>
+        <div class="expenses-scroll-area">
+          <% if @expenses.any? %>
+            <%= form_with url: edit_multiple_expenses_path, method: :post, data: { turbo: false }, id: "edit-form" do %>
+              <% @expenses.each do |expense| %>
+                <div class="expense-item">
+                  <input type="checkbox" 
+                         class="expense-checkbox edit-mode" 
+                         name="selected_ids[]" 
+                         value="<%= expense.id %>" 
+                         id="expense_<%= expense.id %>">
+                  
+                  <div class="expense-content">
+                    <div class="expense-date">
+                      <%= (expense.date.is_a?(String) ? Date.parse(expense.date) : expense.date).strftime('%b %d, %Y') %>
+                    </div>
+                    
+                    <div class="expense-description">
+                      <%= expense.description %>
+                    </div>
+                    
+                    <div class="expense-price">
+                      ¥<%= number_with_delimiter(expense.price) %>
+                    </div>
+                    
+                    <div class="expense-category">
+                      <%= expense.category %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+            <%= form_with url: destroy_multiple_expenses_path, method: :delete, data: { turbo: false }, id: "delete-form" do %>
+              <input type="hidden" name="selected_ids" id="delete-selected-ids" value="">
+            <% end %>
           <% else %>
-            <div class="no-data-message">
-              <p>No expenses to compare for <%= @report_month %></p>
+            <div class="empty-state">
+              <h3>No expenses for <%= Date.current.strftime('%B %Y') %></h3>
+              <p style="margin-bottom: 16px;">Start tracking your expenses by adding your first one!</p>
+              <%= link_to new_expense_path, class: "btn btn-primary" do %>
+                ➕ Add Your First Expense
+              <% end %>
             </div>
           <% end %>
         </div>
-      </div>
-    </div>
-  <% end %>
-
-  <!-- Category breakdown with graph -->
-  <% if @category_totals.any? %>
-    <div class="category-overview fade-in">
-      <h3>📊 Spending by Category</h3>
-      <div class="category-chart">
-        <% @category_totals.each do |category, total| %>
-          <% percentage = @category_percentages[category] || 0 %>
-          <div class="category-bar">
-            <div class="category-info">
-              <div class="category-name"><%= category %></div>
-              <div class="category-amount">¥<%= number_with_delimiter(total) %></div>
-              <div class="category-percentage"><%= percentage %>%</div>
-            </div>
-            <%# .bar-container is the full width (like a track). %>
-            <div class="bar-container">
-              <%# .bar is the colored part, and its width is set by the inline style. %>
-              <%# The percentage below sets the width of the bar, so higher % means a longer bar %>
-              <div class="bar" style="width: <%= percentage %>%"></div>
-            </div>
+        <div class="footer-actions-row">
+          <div class="footer-actions edit-mode" id="edit-actions" style="display: none;">
+            <button type="submit" form="edit-form" class="btn btn-success">
+              ✏️ Edit Selected
+            </button>
           </div>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
-
-  <!-- The main list where current month expenses are shown -->
-  <div class="expense-list fade-in">
-    <div class="expense-list-header flex-header">
-      <h3>📋 Your Expenses - <%= Date.current.strftime('%B %Y') %></h3>
-      <div class="header-actions">
-        <% if user_signed_in? %>
-          <div class="action-bar" style="margin-bottom: 1.5rem;">
-            <%= link_to '➕ Add Expense', new_expense_path, class: 'btn btn-primary' %>
-            <%= link_to '🧾 Scan Receipt', new_receipt_scan_path, class: 'btn btn-secondary' %>
+          <div class="footer-actions edit-mode" id="delete-actions" style="display: none;">
+            <button type="submit" form="delete-form" class="btn btn-danger" onclick="return prepareDelete()">
+              🗑️ Delete Selected
+            </button>
           </div>
-        <% end %>
-        <button onclick="toggleEditMode()" class="btn btn-secondary" id="edit-toggle">
-          ✏️ Edit Mode
-        </button>
+        </div>
       </div>
-    </div>
-    <div class="expenses-scroll-area">
-      <% if @expenses.any? %>
-        <!-- FORM 1: This form is for editing expenses -->
-        <!-- When you check some boxes and click "Edit Selected" -->
-        <%= form_with url: edit_multiple_expenses_path, method: :post, data: { turbo: false }, id: "edit-form" do %>
-          <% @expenses.each do |expense| %>
-            <!-- Each expense item with its own checkbox -->
-            <div class="expense-item">
-              <!-- The checkbox you click to select an expense (hidden until you turn on edit mode) -->
-              <input type="checkbox" 
-                     class="expense-checkbox edit-mode" 
-                     name="selected_ids[]" 
-                     value="<%= expense.id %>" 
-                     id="expense_<%= expense.id %>">
-              
-              <!-- The information about this expense -->
-              <div class="expense-content">
-                <div class="expense-date">
-                  <%= (expense.date.is_a?(String) ? Date.parse(expense.date) : expense.date).strftime('%b %d, %Y') %>
-                </div>
-                
-                <div class="expense-description">
-                  <%= expense.description %>
-                </div>
-                
-                <div class="expense-price">
-                  ¥<%= number_with_delimiter(expense.price) %>
-                </div>
-                
-                <div class="expense-category">
-                  <%= expense.category %>
-                </div>
+    </div> <!-- End Dashboard Slide -->
+
+    <!-- Monthly Overview Slide -->
+    <div class="carousel-slide" id="monthly-slide">
+      <!-- Monthly totals bar chart -->
+      <div class="monthly-overview fade-in">
+        <h3>📅 Monthly Expenses Overview (<%= Date.current.year %>)</h3>
+        <div class="monthly-bar-chart">
+          <% max_total = @monthly_totals.map { |m| m[:total] }.max %>
+          <% @monthly_totals.each do |month_data| %>
+            <div class="month-bar-item">
+              <div class="month-label"><%= month_data[:month][0..2] %></div>
+              <div class="month-bar-container">
+                <% bar_height = max_total > 0 ? (month_data[:total] / max_total.to_f * 100) : 0 %>
+                <div class="month-bar" style="height: <%= bar_height %>%"></div>
               </div>
+              <div class="month-total">¥<%= number_with_delimiter(month_data[:total]) %></div>
             </div>
           <% end %>
-        <% end %>
-        <!-- FORM 2: This form is for deleting expenses -->
-        <!-- This is a separate form so it doesn't mess up the edit form -->
-        <%= form_with url: destroy_multiple_expenses_path, method: :delete, data: { turbo: false }, id: "delete-form" do %>
-          <!-- Hidden field that will hold the IDs of expenses you want to delete -->
-          <input type="hidden" name="selected_ids" id="delete-selected-ids" value="">
-        <% end %>
-      <% else %>
-        <!-- This shows when you have no expenses for the current month -->
-        <div class="empty-state">
-          <h3>No expenses for <%= Date.current.strftime('%B %Y') %></h3>
-          <p style="margin-bottom: 16px;">Start tracking your expenses by adding your first one!</p>
-          <%= link_to new_expense_path, class: "btn btn-primary" do %>
-            ➕ Add Your First Expense
-          <% end %>
         </div>
-      <% end %>
-    </div>
-    <!-- EDIT/DELETE BUTTONS: always at the bottom, right-aligned, with space -->
-    <div class="footer-actions-row">
-      <div class="footer-actions edit-mode" id="edit-actions" style="display: none;">
-        <button type="submit" form="edit-form" class="btn btn-success">
-          ✏️ Edit Selected
-        </button>
       </div>
-      <div class="footer-actions edit-mode" id="delete-actions" style="display: none;">
-        <button type="submit" form="delete-form" class="btn btn-danger" onclick="return prepareDelete()">
-          🗑️ Delete Selected
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Monthly totals bar chart -->
-  <div class="monthly-overview fade-in">
-    <h3>📅 Monthly Expenses Overview (<%= Date.current.year %>)</h3>
-    <div class="monthly-bar-chart">
-      <% max_total = @monthly_totals.map { |m| m[:total] }.max %>
-      <% @monthly_totals.each do |month_data| %>
-        <div class="month-bar-item">
-          <div class="month-label"><%= month_data[:month][0..2] %></div>
-          <div class="month-bar-container">
-            <%# The bar's height is proportional to the month's total compared to the max %>
-            <% bar_height = max_total > 0 ? (month_data[:total] / max_total.to_f * 100) : 0 %>
-            <div class="month-bar" style="height: <%= bar_height %>%"></div>
-          </div>
-          <div class="month-total">¥<%= number_with_delimiter(month_data[:total]) %></div>
-        </div>
-      <% end %>
-    </div>
-  </div>
+    </div> <!-- End Monthly Overview Slide -->
+  </div> <!-- End Carousel Container -->
 </div>
 
 <!-- The code that makes the buttons and checkboxes work -->
@@ -297,4 +304,45 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+// Carousel functionality
+document.addEventListener('DOMContentLoaded', () => {
+  const carouselDots = document.querySelectorAll('.carousel-dot');
+  const carouselSlides = document.querySelectorAll('.carousel-slide');
+  
+  carouselDots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const targetSlide = dot.getAttribute('data-slide');
+      
+      // Update active dot
+      carouselDots.forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+      
+      // Update active slide
+      carouselSlides.forEach(slide => {
+        slide.classList.remove('active');
+        if (slide.id === `${targetSlide}-slide`) {
+          slide.classList.add('active');
+        }
+      });
+    });
+  });
+  
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      const activeDot = document.querySelector('.carousel-dot.active');
+      const currentIndex = Array.from(carouselDots).indexOf(activeDot);
+      
+      let newIndex;
+      if (e.key === 'ArrowLeft') {
+        newIndex = currentIndex > 0 ? currentIndex - 1 : carouselDots.length - 1;
+      } else {
+        newIndex = currentIndex < carouselDots.length - 1 ? currentIndex + 1 : 0;
+      }
+      
+      carouselDots[newIndex].click();
+    }
+  });
+});
 </script>
